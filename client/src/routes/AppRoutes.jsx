@@ -1,6 +1,9 @@
 import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import PublicLayout from "../layouts/PublicLayout";
+import DoctorsPage from "../pages/public/DoctorsPage";
+import DoctorProfilePage from "../pages/public/DoctorProfilePage";
+import ServicesPage from "../pages/public/ServicesPage";
 
 // Inline simple landing test component
 const HomeTest = () => (
@@ -25,18 +28,12 @@ export default function AppRoutes() {
             path="about"
             element={<div className="p-10 text-center">About Page Section</div>}
           />
-          <Route
-            path="services"
-            element={
-              <div className="p-10 text-center">Services Page Section</div>
-            }
-          />
+          <Route path="services" element={<ServicesPage />} />
           <Route
             path="doctors"
-            element={
-              <div className="p-10 text-center">Doctors Grid Section</div>
-            }
+            element={<DoctorsPage />}
           />
+          <Route path="doctors/:id" element={<DoctorProfilePage />} />
           <Route
             path="news"
             element={
