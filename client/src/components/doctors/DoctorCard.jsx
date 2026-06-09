@@ -16,7 +16,10 @@ const DoctorCard = ({ doctor }) => {
         <p className="text-[#3AABBB] font-semibold mt-2">{doctor.role}</p>
         <p className="text-[#3AABBB]">{doctor.department}</p>
         <div className="flex gap-3 mt-4">
-          <button className="bg-[#1B3C6B] text-white px-4 py-2 text-sm rounded hover:bg-[#3AABBB] transition-colors duration-300 cursor-pointer">
+          <button
+  onClick={() => navigate("/appointment")}
+  className="bg-[#1B3C6B] text-white px-4 py-2 text-sm rounded hover:bg-[#3AABBB] transition-colors duration-300 cursor-pointer"
+>
   Request an Appointment
 </button>
          <button

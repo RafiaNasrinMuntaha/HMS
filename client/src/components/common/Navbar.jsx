@@ -5,7 +5,7 @@ import { FaSearch, FaBars, FaTimes } from "react-icons/fa";
 const navLinks = [
   { label: "Home", to: "/" },
   { label: "About us", to: "/about" },
-  { label: "Services", to: "/services" },
+  { label: "Specialties", to: "/specialties" },
   { label: "Doctors", to: "/doctors" },
   { label: "News", to: "/news" },
   { label: "Contact", to: "/contact" },
@@ -19,8 +19,8 @@ export default function Navbar() {
       <div className="max-w-7xl mx-auto flex items-center justify-between">
         {/* Logo */}
         <Link to="/" className="text-2xl font-bold font-heading">
-          <span className="text-white">MED</span>
-          <span className="text-accent">DICAL</span>
+          <span className="text-white">MEDI</span>
+          <span className="text-accent">CORE</span>
         </Link>
 
         {/* Desktop Nav Links */}

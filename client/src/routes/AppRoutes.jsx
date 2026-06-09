@@ -5,11 +5,13 @@ import PublicLayout from "../layouts/PublicLayout";
 import AboutPage from '../pages/public/AboutPage';
 import AppointmentPage from '../pages/public/AppointmentPage';
 
+
 // (Doctors, DoctorProfile, Services)
 import DoctorsPage from "../pages/public/DoctorsPage";
 import DoctorProfilePage from "../pages/public/DoctorProfilePage";
 import ServicesPage from "../pages/public/ServicesPage";
-
+import NewsPage from "../pages/public/NewsPage";
+import NewsDetailPage from "../pages/public/NewsDetailPage";
 
 // Inline simple landing test component
 const HomeTest = () => (
@@ -34,18 +36,14 @@ export default function AppRoutes() {
             path="about"
             element={<AboutPage />}          // <<<< CHANGE HERE
           />
-          <Route path="services" element={<ServicesPage />} />
+          <Route path="specialties" element={<ServicesPage />} />
           <Route
             path="doctors"
             element={<DoctorsPage />}
           />
           <Route path="doctors/:id" element={<DoctorProfilePage />} />
-          <Route
-            path="news"
-            element={
-              <div className="p-10 text-center">News Archive Section</div>
-            }
-          />
+          <Route path="news" element={<NewsPage />} />
+          <Route path="news/:id" element={<NewsDetailPage />} />
           <Route
             path="contact"
             element={

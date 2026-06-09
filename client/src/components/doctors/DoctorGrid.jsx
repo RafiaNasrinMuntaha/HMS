@@ -9,9 +9,9 @@ export const doctors = [
     department: "Neurology",
     image: "/src/assets/doctor1.png",
     expertise: [
-      "Completed MBBS from University of Lagos and FCPS in Neurology from BCPS.",
+      "Completed MBBS from Dhaka Medical College and FCPS in Neurology from BCPS.",
       "Over 15 years of experience treating neurological disorders.",
-      "Worked as Head of Neurology at Lagos General Hospital.",
+      "Worked as Head of Neurology at Dhaka Medical College.",
       "Attended international training programs in neurology across Africa and Europe.",
       "Published numerous research papers in national and international journals.",
     ],
@@ -24,11 +24,11 @@ export const doctors = [
     department: "Cardiology",
     image: "/src/assets/doctor2.png",
     expertise: [
-      "Completed MBBS and MD in Cardiology from University of Ibadan.",
+      "Completed MBBS and MD in Cardiology from Dhaka Medical College.",
       "Specialist in interventional cardiology and heart failure management.",
-      "Previously worked as Chief Cardiologist at Ibadan Heart Centre.",
+      "Previously worked as Chief Cardiologist at United Hospital Dhaka.",
       "Trained in advanced cardiac procedures in India and the United Kingdom.",
-      "Member of the Nigerian Cardiac Society and African Heart Foundation.",
+      "Member of the Bangladesh Cardiac Society and African Heart Foundation.",
     ],
   },
   {
@@ -39,11 +39,11 @@ export const doctors = [
     department: "Gynaecology",
     image: "/src/assets/doctor3.png",
     expertise: [
-      "Completed MBBS from University of Ghana and FCPS in Gynaecology.",
+      "Completed MBBS from Dhaka Medical College and FCPS in Gynaecology.",
       "Specialist in maternal health, high-risk pregnancies, and laparoscopic surgery.",
-      "Worked at Korle Bu Teaching Hospital for over 10 years.",
+      "Worked at Dhaka Medical College Hospital for over 10 years.",
       "Attended women's health training programs in the USA and UK.",
-      "Active member of the Ghana Medical Association and African Gynaecology Society.",
+      "Active member of the Bangladesh Medical Association and African Gynaecology Society.",
     ],
   },
   {

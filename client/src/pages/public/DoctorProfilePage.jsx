@@ -42,9 +42,12 @@ const DoctorProfilePage = () => {
             ))}
           </ul>
 
-          <button className="mt-8 bg-[#3AABBB] text-white px-6 py-2 rounded">
-            Request an Appointment
-          </button>
+          <button
+  onClick={() => navigate("/appointment")}
+  className="mt-8 bg-[#1B3C6B] text-white px-4 py-2 text-sm rounded hover:bg-[#3AABBB] transition-colors duration-300 cursor-pointer"
+>
+  Request an Appointment
+</button>
         </div>
       </div>
     </div>
