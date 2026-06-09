@@ -18,7 +18,7 @@ export default function Footer() {
       <div className="max-w-7xl mx-auto px-6 py-14 grid grid-cols-1 md:grid-cols-4 gap-10">
         {/* Brand */}
         <div className="md:col-span-1">
-          <h2 className="text-3xl font-heading font-bold mb-4">MEDDICAL</h2>
+          <h2 className="text-3xl font-heading font-bold mb-4">MEDICORE</h2>
           <p className="text-blue-200 text-sm leading-relaxed">
             Leading the Way in Medical Excellence, Trusted Care.
           </p>
