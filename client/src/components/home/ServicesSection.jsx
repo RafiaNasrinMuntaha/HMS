@@ -1,27 +1,12 @@
 import { useState } from "react";
-import { FaHeartbeat, FaDna, FaTint, FaStethoscope } from "react-icons/fa";
+import { useNavigate } from "react-router-dom";
+import { Stethoscope, Activity, Dna, Droplets } from "lucide-react";
 
 const services = [
-  {
-    id: "checkup",
-    icon: <FaStethoscope size={28} />,
-    label: "Free Checkup",
-  },
-  {
-    id: "cardiogram",
-    icon: <FaHeartbeat size={28} />,
-    label: "Cardiogram",
-  },
-  {
-    id: "dna",
-    icon: <FaDna size={28} />,
-    label: "Dna Testing",
-  },
-  {
-    id: "blood",
-    icon: <FaTint size={28} />,
-    label: "Blood Bank",
-  },
+  { id: 7, icon: Stethoscope, label: "Free Checkup" },
+  { id: 8, icon: Activity, label: "Cardiogram" },
+  { id: 9, icon: Dna, label: "DNA Testing" },
+  { id: 10, icon: Droplets, label: "Blood Bank" },
 ];
 
 const features = [
@@ -33,8 +18,19 @@ const features = [
   "Always Caring",
 ];
 
+const images = [
+  "https://images.unsplash.com/photo-1551190822-a9333d879b1f?w=600&q=80",
+  "https://images.unsplash.com/photo-1622253692010-333f2da6031d?w=600&q=80",
+];
+
 export default function ServicesSection() {
-  const [active, setActive] = useState("cardiogram");
+  const [active, setActive] = useState(7);
+  const navigate = useNavigate();
+
+  const handleServiceClick = (id) => {
+    setActive(id);
+    navigate("/specialties", { state: { selectedId: id } });
+  };
 
   return (
     <section className="py-20 px-6 bg-gray-50">
@@ -50,20 +46,21 @@ export default function ServicesSection() {
         </div>
 
         {/* Layout */}
-        <div className="grid grid-cols-1 md:grid-cols-[220px_1fr_320px] gap-0 border border-gray-200 bg-white">
-          {/* Left Sidebar */}
+        <div className="grid grid-cols-1 md:grid-cols-[200px_1fr_280px] border border-gray-200 bg-white">
+          {/* Left Sidebar — each tab is a link */}
           <div className="flex flex-col border-r border-gray-200">
-            {services.map(({ id, icon, label }) => (
+            {services.map(({ id, icon: Icon, label }) => (
               <button
                 key={id}
-                onClick={() => setActive(id)}
-                className={`flex flex-col items-center justify-center gap-2 py-8 px-4 border-b border-gray-200 transition-all duration-200
-                  ${active === id ? "bg-primary text-white" : "bg-white text-primary hover:bg-cardBg"}
-                `}
+                onClick={() => handleServiceClick(id)}
+                className={`flex flex-col items-center justify-center gap-2 py-8 px-4 border-b border-gray-200 transition-all duration-200 cursor-pointer
+                  ${
+                    active === id
+                      ? "bg-primary text-white"
+                      : "bg-white text-primary hover:bg-cardBg"
+                  }`}
               >
-                <span className={active === id ? "text-accent" : "text-accent"}>
-                  {icon}
-                </span>
+                <Icon size={28} className="text-accent" />
                 <span className="text-sm font-medium">{label}</span>
               </button>
             ))}
@@ -75,7 +72,6 @@ export default function ServicesSection() {
               A passion for putting patients first.
             </h3>
 
-            {/* Feature checklist */}
             <div className="grid grid-cols-2 gap-3 mb-6">
               {features.map((f) => (
                 <div
@@ -95,25 +91,31 @@ export default function ServicesSection() {
               augue. Velit nascetur proin massa in. Consequat faucibus porttitor
               enim et.
             </p>
-            <p className="text-gray-500 text-sm leading-relaxed">
+            <p className="text-gray-500 text-sm leading-relaxed mb-6">
               Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quisque
               placerat scelerisque. Convallis felis vitae tortor augue. Velit
               nascetur proin massa in.
             </p>
+
+            <button
+              onClick={() => navigate("/specialties")}
+              className="text-accent font-semibold hover:underline inline-flex items-center gap-1 text-sm"
+            >
+              View All Services →
+            </button>
           </div>
 
-          {/* Right Images */}
-          <div className="flex flex-col gap-0">
-            <img
-              src="https://images.unsplash.com/photo-1579684385127-1ef15d508118?w=600"
-              alt="Service"
-              className="w-full h-48 object-cover"
-            />
-            <img
-              src="https://images.unsplash.com/photo-1622253692010-333f2da6031d?w=600"
-              alt="Service"
-              className="w-full h-48 object-cover"
-            />
+          {/* Right Images — fixed with explicit height */}
+          <div className="flex flex-col">
+            {images.map((src, i) => (
+              <img
+                key={i}
+                src={src}
+                alt={`service-${i}`}
+                className="w-full flex-1 object-cover"
+                style={{ height: "200px" }}
+              />
+            ))}
           </div>
         </div>
       </div>

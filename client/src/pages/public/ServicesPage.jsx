@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
 import {
   Brain,
   Heart,
@@ -159,6 +159,15 @@ const items = [
 const ServicesPage = () => {
   const [selected, setSelected] = useState(items[0]);
   const navigate = useNavigate();
+  const location = useLocation();
+
+  // Handle incoming routing state from other pages (e.g. Home)
+  useEffect(() => {
+    if (location.state?.selectedId) {
+      const found = items.find((item) => item.id === location.state.selectedId);
+      if (found) setSelected(found);
+    }
+  }, [location.state]);
 
   return (
     <div>
@@ -166,7 +175,7 @@ const ServicesPage = () => {
       <div className="bg-blue-50 py-12 px-6 text-center">
         <button
           onClick={() => navigate("/")}
-          className="flex items-center gap-2 text-[#1B3C6B] font-semibold mb-4 hover:underline"
+          className="flex items-center gap-2 text-[#1B3C6B] font-semibold mb-4 hover:underline cursor-pointer"
         >
           ← Back to Home
         </button>
@@ -175,8 +184,7 @@ const ServicesPage = () => {
 
       {/* Content */}
       <div className="max-w-6xl mx-auto px-6 py-16 flex gap-10">
-
-        {/* Grid */}
+        {/* Left Grid Navigation */}
         <div className="w-72 flex-shrink-0 grid grid-cols-2 gap-3 h-fit">
           {items.map((item) => {
             const Icon = item.icon;
@@ -185,9 +193,10 @@ const ServicesPage = () => {
                 key={item.id}
                 onClick={() => setSelected(item)}
                 className={`flex flex-col items-center justify-center p-4 rounded-lg border transition-colors duration-200 cursor-pointer
-                  ${selected.id === item.id
-                    ? "bg-[#1B3C6B] text-white border-[#1B3C6B]"
-                    : "bg-white text-[#1B3C6B] border-gray-200 hover:border-[#3AABBB] hover:text-[#3AABBB]"
+                  ${
+                    selected.id === item.id
+                      ? "bg-[#1B3C6B] text-white border-[#1B3C6B]"
+                      : "bg-white text-[#1B3C6B] border-gray-200 hover:border-[#3AABBB] hover:text-[#3AABBB]"
                   }`}
               >
                 <Icon size={28} className="mb-2" />
@@ -199,7 +208,7 @@ const ServicesPage = () => {
           })}
         </div>
 
-        {/* Detail */}
+        {/* Right Detail Panel */}
         <div className="flex-1 bg-blue-50 rounded-lg p-8">
           {(() => {
             const Icon = selected.icon;
@@ -210,9 +219,11 @@ const ServicesPage = () => {
                   {selected.name}
                 </h2>
                 <p className="text-gray-600 mb-6">{selected.description}</p>
+
                 <h3 className="text-lg font-semibold text-[#1B3C6B] mb-3">
                   What We Offer
                 </h3>
+
                 <ul className="space-y-2 mb-8">
                   {selected.details.map((point, index) => (
                     <li
@@ -224,6 +235,7 @@ const ServicesPage = () => {
                     </li>
                   ))}
                 </ul>
+
                 <button
                   onClick={() => navigate("/appointment")}
                   className="bg-[#1B3C6B] text-white px-6 py-2 rounded hover:bg-[#3AABBB] transition-colors duration-300 cursor-pointer"

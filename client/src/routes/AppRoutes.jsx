@@ -1,60 +1,31 @@
 import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import PublicLayout from "../layouts/PublicLayout";
-//  (About, Appointment)
-import AboutPage from '../pages/public/AboutPage';
-import AppointmentPage from '../pages/public/AppointmentPage';
 
-
-// (Doctors, DoctorProfile, Services)
+// Pages
+import HomePage from "../pages/public/HomePage"; // ADD THIS
+import AboutPage from "../pages/public/AboutPage";
+import AppointmentPage from "../pages/public/AppointmentPage";
 import DoctorsPage from "../pages/public/DoctorsPage";
 import DoctorProfilePage from "../pages/public/DoctorProfilePage";
 import ServicesPage from "../pages/public/ServicesPage";
 import NewsPage from "../pages/public/NewsPage";
 import NewsDetailPage from "../pages/public/NewsDetailPage";
-
-// Inline simple landing test component
-const HomeTest = () => (
-  <div className="py-20 text-center bg-gray-50">
-    <h2 className="text-3xl font-bold font-heading text-primary">
-      Welcome to MediCore
-    </h2>
-    <p className="text-gray-600 mt-2">
-      The main page content area compiles here.
-    </p>
-  </div>
-);
-
+import ContactPage from "../pages/public/ContactPage";
 export default function AppRoutes() {
   return (
     <Router>
       <Routes>
-        {/* Public Routes wrapping our Layout */}
         <Route path="/" element={<PublicLayout />}>
-          <Route index element={<HomeTest />} />
-          <Route
-            path="about"
-            element={<AboutPage />}          // <<<< CHANGE HERE
-          />
+          <Route index element={<HomePage />} /> {/* CHANGE THIS */}
+          <Route path="about" element={<AboutPage />} />
           <Route path="specialties" element={<ServicesPage />} />
-          <Route
-            path="doctors"
-            element={<DoctorsPage />}
-          />
+          <Route path="doctors" element={<DoctorsPage />} />
           <Route path="doctors/:id" element={<DoctorProfilePage />} />
           <Route path="news" element={<NewsPage />} />
           <Route path="news/:id" element={<NewsDetailPage />} />
-          <Route
-            path="contact"
-            element={
-              <div className="p-10 text-center">Contact Form Section</div>
-            }
-          />
-           <Route
-            path="appointment"
-            element={<AppointmentPage />}    // <<<< CHANGE HERE
-          />
-         
+          <Route path="contact" element={<ContactPage />} />
+          <Route path="appointment" element={<AppointmentPage />} />
         </Route>
       </Routes>
     </Router>
