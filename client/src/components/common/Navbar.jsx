@@ -5,7 +5,7 @@ import { FaSearch, FaBars, FaTimes } from "react-icons/fa";
 const navLinks = [
   { label: "Home", to: "/" },
   { label: "About us", to: "/about" },
-  { label: "Specialties", to: "/specialties" },
+  { label: "Services", to: "/specialties" },
   { label: "Doctors", to: "/doctors" },
   { label: "News", to: "/news" },
   { label: "Contact", to: "/contact" },

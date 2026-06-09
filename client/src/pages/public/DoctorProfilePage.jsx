@@ -11,7 +11,7 @@ const DoctorProfilePage = () => {
   }
 
   return (
-    <div className="max-w-4xl mx-auto px-6 py-16">
+    <div className="max-w-4xl mx-auto px-4 sm:px-6 py-10 sm:py-16">
       <button
         onClick={() => navigate("/doctors")}
         className="flex items-center gap-2 text-[#1B3C6B] font-semibold mb-8 hover:underline"
@@ -19,14 +19,14 @@ const DoctorProfilePage = () => {
         ← Back to Doctors
       </button>
 
-      <div className="flex gap-10 items-start">
+      <div className="flex flex-col sm:flex-row gap-6 sm:gap-10 items-start">
         <img
           src={doctor.image}
           alt={doctor.name}
-          className="w-48 h-56 object-cover rounded border-4 border-[#3AABBB]"
+          className="w-full sm:w-48 h-56 object-cover rounded border-4 border-[#3AABBB]"
         />
         <div>
-          <h1 className="text-3xl font-bold text-[#1B3C6B]">{doctor.name}</h1>
+          <h1 className="text-2xl sm:text-3xl font-bold text-[#1B3C6B]">{doctor.name}</h1>
           <p className="text-gray-500 mt-1">{doctor.degree}</p>
           <p className="text-[#3AABBB] font-semibold mt-2">{doctor.role}</p>
           <p className="text-[#3AABBB]">

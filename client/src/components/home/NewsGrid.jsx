@@ -33,15 +33,14 @@ const news = [
       "https://images.unsplash.com/photo-1579684385127-1ef15d508118?w=600&q=80",
   },
   {
-    id: 1,
-    date: "Monday 05, January 2026",
-    author: "Professor Dr Shaikh Md Hasan Mamun",
-    title: "The Importance of Regular Heart Checkups",
-    views: 68,
-    likes: 86,
-    image:
-      "https://images.unsplash.com/photo-1628348068343-c6a848d2b6dd?w=600&q=80",
-  },
+  id: 4,
+  date: "Saturday 18, April 2026",
+  author: "Dr. Rahul Bhan",
+  title: "Recovering From Joint Replacement Surgery: What to Expect",
+  views: 63,
+  likes: 88,
+  image: "https://images.unsplash.com/photo-1551601651-2a8555f1a136?w=600&q=80",
+},
 ];
 
 export default function NewsGrid() {

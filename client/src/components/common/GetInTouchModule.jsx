@@ -4,25 +4,25 @@ const cards = [
   {
     icon: <FaPhone size={28} />,
     title: "EMERGENCY",
-    lines: ["(237) 681-812-255", "(237) 666-331-894"],
+    lines: ["+880 2-1234567", "+880 1711-000000"],
     highlight: false,
   },
   {
     icon: <FaMapMarkerAlt size={28} />,
     title: "LOCATION",
-    lines: ["0123 Some place", "9876 Some country"],
-    highlight: true, // dark navy card
+    lines: ["123 Airport Road", "Dhaka, Bangladesh"],
+    highlight: true,
   },
   {
     icon: <FaEnvelope size={28} />,
     title: "EMAIL",
-    lines: ["fildineesoe@gmail.com", "myebstudios@gmail.com"],
+    lines: ["info@medicore.com.bd", "support@medicore.com"],
     highlight: false,
   },
   {
     icon: <FaClock size={28} />,
     title: "WORKING HOURS",
-    lines: ["Mon-Sat 09:00-20:00", "Sunday Emergency only"],
+    lines: ["Sat-Thu 09:00-20:00", "Friday Emergency only"],
     highlight: false,
   },
 ];

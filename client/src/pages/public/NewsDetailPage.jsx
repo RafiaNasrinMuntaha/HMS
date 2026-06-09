@@ -86,6 +86,40 @@ const allNews = [
       your life is worth it.
     `,
   },
+  {
+  id: 4,
+  title: "Recovering From Joint Replacement Surgery: What to Expect",
+  category: "Surgery",
+  author: "Dr. Rahul Bhan",
+  date: "Friday 01, May 2026",
+  views: 63,
+  likes: 88,
+  image: "https://images.unsplash.com/photo-1551601651-2a8555f1a136?w=600&q=80",
+  content: `
+    Joint replacement surgery is one of the most successful procedures in modern medicine. 
+    Whether it is a hip, knee, or shoulder replacement, thousands of patients regain their 
+    mobility and quality of life each year thanks to this procedure.
+
+    At MediCore, our orthopaedic team ensures that every patient receives comprehensive 
+    pre-operative and post-operative care. Before surgery, our specialists will assess 
+    your overall health, explain the procedure in detail, and prepare a personalised 
+    recovery plan.
+
+    The first few days after surgery are the most critical. Patients can expect some 
+    swelling, discomfort, and limited mobility. Our nursing staff and physiotherapists 
+    are available around the clock to manage pain and guide you through early movement 
+    exercises.
+
+    Most patients are able to walk with assistance within 24 hours of surgery. Full 
+    recovery typically takes between 6 to 12 weeks depending on the type of replacement 
+    and the patient's overall health condition.
+
+    Our physiotherapy team will work with you through every stage of recovery — from 
+    gentle range-of-motion exercises in the hospital to strength training at home. 
+    We are committed to helping you get back to your normal life as quickly and safely 
+    as possible.
+  `,
+},
 ];
 
 const NewsDetailPage = () => {
@@ -98,7 +132,7 @@ const NewsDetailPage = () => {
   }
 
   return (
-    <div className="max-w-4xl mx-auto px-6 py-16">
+    <div className="max-w-4xl mx-auto px-4 sm:px-6 py-10 sm:py-16">
       <button
         onClick={() => navigate("/news")}
         className="flex items-center gap-2 text-[#1B3C6B] font-semibold mb-8 hover:underline"
@@ -112,7 +146,7 @@ const NewsDetailPage = () => {
         className="w-full h-80 object-cover rounded mb-8"
       />
 
-      <div className="flex items-center gap-4 text-sm text-[#3AABBB] mb-4">
+      <div className="flex flex-wrap items-center gap-3 text-sm text-[#3AABBB] mb-4">
         <span>📅 {news.date}</span>
         <span>✍️ By {news.author}</span>
         <span className="bg-[#3AABBB] text-white px-3 py-1 rounded-full text-xs">
@@ -122,13 +156,13 @@ const NewsDetailPage = () => {
         <span>❤️ {news.likes}</span>
       </div>
 
-      <h1 className="text-3xl font-bold text-[#1B3C6B] mb-6">{news.title}</h1>
+      <h1 className="text-2xl sm:text-3xl font-bold text-[#1B3C6B] mb-6">{news.title}</h1>
 
       <div className="text-gray-600 leading-8 whitespace-pre-line">
         {news.content}
       </div>
 
-      <div className="mt-10 flex gap-4">
+      <div className="mt-10 flex flex-col sm:flex-row gap-4">
         <button
           onClick={() => navigate("/appointment")}
           className="bg-[#1B3C6B] text-white px-6 py-2 rounded hover:bg-[#3AABBB] transition-colors duration-300 cursor-pointer"

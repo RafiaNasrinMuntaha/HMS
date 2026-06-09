@@ -1,7 +1,7 @@
 import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import PublicLayout from "../layouts/PublicLayout";
-
+import ScrollToTop from "../components/common/ScrollToTop";
 // Pages
 import HomePage from "../pages/public/HomePage"; // ADD THIS
 import AboutPage from "../pages/public/AboutPage";
@@ -12,9 +12,11 @@ import ServicesPage from "../pages/public/ServicesPage";
 import NewsPage from "../pages/public/NewsPage";
 import NewsDetailPage from "../pages/public/NewsDetailPage";
 import ContactPage from "../pages/public/ContactPage";
+
 export default function AppRoutes() {
   return (
     <Router>
+      <ScrollToTop />
       <Routes>
         <Route path="/" element={<PublicLayout />}>
           <Route index element={<HomePage />} /> {/* CHANGE THIS */}
