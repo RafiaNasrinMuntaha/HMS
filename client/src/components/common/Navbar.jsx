@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, NavLink } from "react-router-dom";
-import { FaSearch, FaBars, FaTimes } from "react-icons/fa";
+import { FaSearch, FaBars, FaTimes, FaUserCircle } from "react-icons/fa";
 
 const navLinks = [
   { label: "Home", to: "/" },
@@ -42,13 +42,32 @@ export default function Navbar() {
         </ul>
 
         {/* Right Side */}
-        <div className="hidden md:flex items-center gap-5">
+        <div className="hidden md:flex items-center gap-4">
           <button className="text-white hover:text-accent transition-colors">
             <FaSearch size={18} />
           </button>
+
+          {/* Sign In */}
+          <Link
+            to="/login"
+            className="flex items-center gap-2 text-white text-sm font-medium hover:text-accent transition-colors"
+          >
+            <FaUserCircle size={18} />
+            Sign In
+          </Link>
+
+          {/* Sign Up */}
+          <Link
+            to="/register"
+            className="bg-accent text-white text-sm font-semibold px-5 py-2 rounded-full hover:bg-cyan-400 transition-all duration-200"
+          >
+            Sign Up
+          </Link>
+
+          {/* Appointment */}
           <Link
             to="/appointment"
-            className="bg-white text-primary font-semibold text-sm px-6 py-2 rounded-full hover:bg-accent hover:text-white transition-all duration-200"
+            className="bg-white text-primary font-semibold text-sm px-5 py-2 rounded-full hover:bg-accent hover:text-white transition-all duration-200"
           >
             Appointment
           </Link>
@@ -78,6 +97,21 @@ export default function Navbar() {
               {label}
             </NavLink>
           ))}
+          <hr className="border-white/20" />
+          <Link
+            to="/login"
+            onClick={() => setMenuOpen(false)}
+            className="text-white text-sm font-medium"
+          >
+            Sign In
+          </Link>
+          <Link
+            to="/register"
+            onClick={() => setMenuOpen(false)}
+            className="bg-accent text-white text-sm font-semibold px-5 py-2 rounded-full text-center"
+          >
+            Sign Up
+          </Link>
           <Link
             to="/appointment"
             onClick={() => setMenuOpen(false)}

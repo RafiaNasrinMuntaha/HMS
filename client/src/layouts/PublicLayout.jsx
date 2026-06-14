@@ -7,8 +7,8 @@ import Footer from "../components/common/Footer";
 export default function PublicLayout() {
   const location = useLocation();
 
-  // Pages that have their own contact section
-  const hideGetInTouch = ["/contact"].includes(location.pathname);
+  // Only show GetInTouch on homepage and contact page
+  const showGetInTouch = ["/"].includes(location.pathname);
 
   return (
     <div className="flex flex-col min-h-screen">
@@ -17,7 +17,7 @@ export default function PublicLayout() {
       <main className="flex-1">
         <Outlet />
       </main>
-      {!hideGetInTouch && <GetInTouchModule />}
+      {showGetInTouch && <GetInTouchModule />}
       <Footer />
     </div>
   );

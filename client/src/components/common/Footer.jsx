@@ -1,5 +1,10 @@
 import { Link } from "react-router-dom";
-import { FaLinkedinIn, FaFacebookF, FaInstagram, FaEnvelope} from "react-icons/fa";
+import {
+  FaLinkedinIn,
+  FaFacebookF,
+  FaInstagram,
+  FaEnvelope,
+} from "react-icons/fa";
 import { useState } from "react";
 
 const importantLinks = [
@@ -46,9 +51,9 @@ export default function Footer() {
           <h4 className="font-semibold text-base mb-5">Contact Us</h4>
           <ul className="space-y-2 text-blue-200 text-sm">
             <li>Call: +880 2-1234567</li>
-<li>Email: info@medicore.com.bd</li>
-<li>Address: 123 Airport Road</li>
-<li>Dhaka, Bangladesh</li>
+            <li>Email: info@medicore.com.bd</li>
+            <li>Address: 123 Airport Road</li>
+            <li>Dhaka, Bangladesh</li>
           </ul>
         </div>
 
