@@ -1,15 +1,43 @@
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import DoctorGrid from "../../components/doctors/DoctorGrid";
+import DoctorGrid, { doctors } from "../../components/doctors/DoctorGrid";
+
+const departments = [
+  "All",
+  "Cardiology",
+  "Dermatology",
+  "Gynaecology",
+  "Neurology",
+  "Nephrology",
+  "Orthopaedics",
+  "Oncology",
+  "Ophthalmology",
+  "Paediatrics",
+  "Radiology & Imaging",
+];
 
 const DoctorsPage = () => {
   const navigate = useNavigate();
+  const [search, setSearch] = useState("");
+  const [selectedDept, setSelectedDept] = useState("All");
+
+  const filtered = doctors.filter((doctor) => {
+    const matchesSearch = doctor.name
+      .toLowerCase()
+      .includes(search.toLowerCase());
+    const matchesDept =
+      selectedDept === "All" || doctor.department === selectedDept;
+    return matchesSearch && matchesDept;
+  });
 
   return (
     <div>
+      {/* Banner */}
       <div
         className="relative py-10 sm:py-12 px-4 sm:px-6"
         style={{
-          backgroundImage: "url(https://images.unsplash.com/photo-1504813184591-01572f98c85f?w=1600&q=80)",
+          backgroundImage:
+            "url(https://images.unsplash.com/photo-1504813184591-01572f98c85f?w=1600&q=80)",
           backgroundSize: "cover",
           backgroundPosition: "center",
         }}
@@ -22,10 +50,46 @@ const DoctorsPage = () => {
           >
             ← Back to Home
           </button>
-          <h1 className="text-4xl font-bold text-[#1B3C6B] text-center">Our Doctors</h1>
+          <h1 className="text-4xl font-bold text-[#1B3C6B] text-center">
+            Our Doctors
+          </h1>
         </div>
       </div>
-      <DoctorGrid />
+
+      {/* Search and Filter Bar */}
+      <div className="bg-white border-b border-gray-200 py-4 px-4 sm:px-6 shadow-sm">
+        <div className="max-w-6xl mx-auto flex flex-col sm:flex-row gap-4">
+          <select
+            value={selectedDept}
+            onChange={(e) => setSelectedDept(e.target.value)}
+            className="w-full sm:w-72 border border-gray-300 rounded px-4 py-2 text-sm outline-none focus:border-[#3AABBB] text-[#1B3C6B] cursor-pointer"
+          >
+            {departments.map((dept) => (
+              <option key={dept} value={dept}>
+                {dept === "All" ? "All departments" : dept}
+              </option>
+            ))}
+          </select>
+
+          <input
+            type="text"
+            placeholder="Search by doctor name"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="flex-1 border border-gray-300 rounded px-4 py-2 text-sm outline-none focus:border-[#3AABBB]"
+          />
+        </div>
+      </div>
+
+      {/* Content */}
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 py-10">
+        <p className="text-gray-500 text-sm mb-6">
+          Showing{" "}
+          <span className="font-bold text-[#1B3C6B]">{filtered.length}</span>{" "}
+          doctors
+        </p>
+        <DoctorGrid filtered={filtered} />
+      </div>
     </div>
   );
 };

@@ -3,9 +3,128 @@ import { Link } from "react-router-dom";
 import { FaClock, FaPhoneAlt, FaAmbulance } from 'react-icons/fa';
 
 const AppointmentPage = () => {
+  // ---------- FORM STATE (doctor initially empty) ----------
   const [formData, setFormData] = useState({
-    name: '', gender: '', email: '', phone: '', date: '', doctor: '', department: '', message: ''
+    name: '',
+    gender: '',
+    email: '',
+    phone: '',
+    date: '',
+    doctor: '',           // empty by default - no doctor selected
+    department: '',
+    message: ''
   });
+
+  // ---------- DOCTOR LIST ----------
+  const doctorList = [
+    'Prof. Brig. Gen Ghulam Kawnayn',
+    'Dr. Asif Ahmed Bin Moin',
+    'Dr. Fahmida Akhter',
+    'Dr. Rahul Bhan',
+    'Dr. Abu Jafar Mohammed Saleh',
+    'Dr. Farzana Haseen',
+    'Dr. Mohammad Enamul Hoque',
+    'Dr. Ayesha Perveen',
+    'Dr. Dipika Dey',
+    'Dr. Md. Faizur Rahman'
+  ];
+
+  // ---------- DOCTOR SCHEDULES ----------
+  const getDoctorSchedule = (doctorName) => {
+    const schedules = {
+      'Prof. Brig. Gen Ghulam Kawnayn': [
+        { day: 'Monday', hours: '09:00 AM - 05:00 PM' },
+        { day: 'Tuesday', hours: '09:00 AM - 05:00 PM' },
+        { day: 'Wednesday', hours: '09:00 AM - 05:00 PM' },
+        { day: 'Thursday', hours: '09:00 AM - 05:00 PM' },
+        { day: 'Friday', hours: '02:00 PM - 08:00 PM' },
+        { day: 'Saturday', hours: 'Closed' },
+        { day: 'Sunday', hours: 'Closed' }
+      ],
+      'Dr. Asif Ahmed Bin Moin': [
+        { day: 'Monday', hours: '10:00 AM - 06:00 PM' },
+        { day: 'Tuesday', hours: '10:00 AM - 06:00 PM' },
+        { day: 'Wednesday', hours: '10:00 AM - 06:00 PM' },
+        { day: 'Thursday', hours: '10:00 AM - 06:00 PM' },
+        { day: 'Friday', hours: '10:00 AM - 02:00 PM' },
+        { day: 'Saturday', hours: 'Closed' },
+        { day: 'Sunday', hours: '10:00 AM - 04:00 PM' }
+      ],
+      'Dr. Fahmida Akhter': [
+        { day: 'Monday', hours: '08:00 AM - 02:00 PM' },
+        { day: 'Tuesday', hours: '08:00 AM - 02:00 PM' },
+        { day: 'Wednesday', hours: '08:00 AM - 02:00 PM' },
+        { day: 'Thursday', hours: '08:00 AM - 02:00 PM' },
+        { day: 'Friday', hours: 'Closed' },
+        { day: 'Saturday', hours: '09:00 AM - 01:00 PM' },
+        { day: 'Sunday', hours: 'Closed' }
+      ],
+      'Dr. Rahul Bhan': [
+        { day: 'Monday', hours: '09:00 AM - 08:00 PM' },
+        { day: 'Tuesday', hours: '09:00 AM - 08:00 PM' },
+        { day: 'Wednesday', hours: '09:00 AM - 08:00 PM' },
+        { day: 'Thursday', hours: '09:00 AM - 08:00 PM' },
+        { day: 'Friday', hours: '09:00 AM - 08:00 PM' },
+        { day: 'Saturday', hours: '09:00 AM - 08:00 PM' },
+        { day: 'Sunday', hours: '09:00 AM - 08:00 PM' }
+      ],
+      'Dr. Abu Jafar Mohammed Saleh': [
+        { day: 'Monday', hours: '11:00 AM - 07:00 PM' },
+        { day: 'Tuesday', hours: '11:00 AM - 07:00 PM' },
+        { day: 'Wednesday', hours: '11:00 AM - 07:00 PM' },
+        { day: 'Thursday', hours: '11:00 AM - 07:00 PM' },
+        { day: 'Friday', hours: '03:00 PM - 09:00 PM' },
+        { day: 'Saturday', hours: 'Closed' },
+        { day: 'Sunday', hours: '11:00 AM - 05:00 PM' }
+      ],
+      'Dr. Farzana Haseen': [
+        { day: 'Monday', hours: '08:30 AM - 04:30 PM' },
+        { day: 'Tuesday', hours: '08:30 AM - 04:30 PM' },
+        { day: 'Wednesday', hours: '08:30 AM - 04:30 PM' },
+        { day: 'Thursday', hours: '08:30 AM - 04:30 PM' },
+        { day: 'Friday', hours: 'Closed' },
+        { day: 'Saturday', hours: '09:00 AM - 12:00 PM' },
+        { day: 'Sunday', hours: 'Closed' }
+      ],
+      'Dr. Mohammad Enamul Hoque': [
+        { day: 'Monday', hours: '12:00 PM - 08:00 PM' },
+        { day: 'Tuesday', hours: '12:00 PM - 08:00 PM' },
+        { day: 'Wednesday', hours: '12:00 PM - 08:00 PM' },
+        { day: 'Thursday', hours: '12:00 PM - 08:00 PM' },
+        { day: 'Friday', hours: '04:00 PM - 09:00 PM' },
+        { day: 'Saturday', hours: '10:00 AM - 02:00 PM' },
+        { day: 'Sunday', hours: 'Closed' }
+      ],
+      'Dr. Ayesha Perveen': [
+        { day: 'Monday', hours: '09:00 AM - 06:00 PM' },
+        { day: 'Tuesday', hours: '09:00 AM - 06:00 PM' },
+        { day: 'Wednesday', hours: '09:00 AM - 06:00 PM' },
+        { day: 'Thursday', hours: '09:00 AM - 06:00 PM' },
+        { day: 'Friday', hours: '02:00 PM - 07:00 PM' },
+        { day: 'Saturday', hours: 'Closed' },
+        { day: 'Sunday', hours: 'Closed' }
+      ],
+      'Dr. Dipika Dey': [
+        { day: 'Monday', hours: '07:00 AM - 03:00 PM' },
+        { day: 'Tuesday', hours: '07:00 AM - 03:00 PM' },
+        { day: 'Wednesday', hours: '07:00 AM - 03:00 PM' },
+        { day: 'Thursday', hours: '07:00 AM - 03:00 PM' },
+        { day: 'Friday', hours: 'Closed' },
+        { day: 'Saturday', hours: '08:00 AM - 12:00 PM' },
+        { day: 'Sunday', hours: 'Closed' }
+      ],
+      'Dr. Md. Faizur Rahman': [
+        { day: 'Monday', hours: '02:00 PM - 10:00 PM' },
+        { day: 'Tuesday', hours: '02:00 PM - 10:00 PM' },
+        { day: 'Wednesday', hours: '02:00 PM - 10:00 PM' },
+        { day: 'Thursday', hours: '02:00 PM - 10:00 PM' },
+        { day: 'Friday', hours: '02:00 PM - 10:00 PM' },
+        { day: 'Saturday', hours: '02:00 PM - 10:00 PM' },
+        { day: 'Sunday', hours: 'Closed' }
+      ]
+    };
+    return schedules[doctorName] || [];
+  };
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -13,25 +132,22 @@ const AppointmentPage = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    if (!formData.doctor) {
+      alert('Please select a doctor');
+      return;
+    }
     console.log('Appointment Data:', formData);
     alert('Appointment request submitted (demo)');
   };
 
-  const schedule = [
-    { day: 'Monday', hours: '09:00 AM - 08:00 PM' },
-    { day: 'Tuesday', hours: '09:00 AM - 08:00 PM' },
-    { day: 'Wednesday', hours: '09:00 AM - 08:00 PM' },
-    { day: 'Thursday', hours: '09:00 AM - 08:00 PM' },
-    { day: 'Friday', hours: '09:00 AM - 08:00 PM' },
-    { day: 'Saturday', hours: '09:00 AM - 08:00 PM' },
-    { day: 'Sunday', hours: '09:00 AM - 08:00 PM' }
-  ];
+  // Determine schedule to display: only if a doctor is selected
+  const currentSchedule = formData.doctor ? getDoctorSchedule(formData.doctor) : null;
 
   return (
     <div className="bg-gradient-to-br from-gray-50 to-gray-100 min-h-screen py-12">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
-        {/* Header with reduced font sizes */}
+        {/* Header */}
         <div className="mb-14">
           <div className="mb-3">
             <p className="text-[#4bc8e8] text-sm md:text-base">
@@ -93,12 +209,16 @@ const AppointmentPage = () => {
                     <input type="date" name="date" value={formData.date} onChange={handleChange} 
                       className="w-full border border-gray-300 rounded-lg px-4 py-2 transition-all duration-200 focus:ring-2 focus:ring-[#4bc8e8] focus:border-[#1b3a6b] focus:shadow-md outline-none" required />
                   </div>
-                  {/* Doctor */}
+                  {/* Doctor Dropdown with placeholder */}
                   <div>
                     <label className="block text-gray-700 mb-1 font-medium">Doctor</label>
-                    <input type="text" name="doctor" value={formData.doctor} onChange={handleChange} 
-                      placeholder="Doctor's name" 
-                      className="w-full border border-gray-300 rounded-lg px-4 py-2 transition-all duration-200 focus:ring-2 focus:ring-[#4bc8e8] focus:border-[#1b3a6b] focus:shadow-md outline-none" />
+                    <select name="doctor" value={formData.doctor} onChange={handleChange} 
+                      className="w-full border border-gray-300 rounded-lg px-4 py-2 transition-all duration-200 focus:ring-2 focus:ring-[#4bc8e8] focus:border-[#1b3a6b] focus:shadow-md outline-none" required>
+                      <option value="" disabled>Select Doctor</option>
+                      {doctorList.map((doc, idx) => (
+                        <option key={idx} value={doc}>{doc}</option>
+                      ))}
+                    </select>
                   </div>
                   {/* Department */}
                   <div className="md:col-span-2">
@@ -135,7 +255,7 @@ const AppointmentPage = () => {
             </div>
           </div>
 
-          {/* RIGHT: Combined Card */}
+          {/* RIGHT: Combined Card (Schedule + Emergency) */}
           <div className="transition-all duration-300 hover:-translate-y-1 hover:shadow-xl">
             <div className="bg-white rounded-2xl shadow-lg p-6 h-full flex flex-col border border-gray-100">
               <div>
@@ -143,14 +263,22 @@ const AppointmentPage = () => {
                   <FaClock className="text-[#4bc8e8] text-xl" />
                   Schedule hours
                 </h2>
-                <div className="space-y-3">
-                  {schedule.map((item, idx) => (
-                    <div key={idx} className="flex justify-between items-center py-1 border-b border-gray-50">
-                      <span className="font-semibold text-gray-700">{item.day}</span>
-                      <span className="text-[#1b3a6b] font-medium">{item.hours}</span>
-                    </div>
-                  ))}
-                </div>
+                {currentSchedule ? (
+                  <div className="space-y-3">
+                    {currentSchedule.map((item, idx) => (
+                      <div key={idx} className="flex justify-between items-center py-1 border-b border-gray-50">
+                        <span className="font-semibold text-gray-700">{item.day}</span>
+                        <span className={`font-medium ${item.hours === 'Closed' ? 'text-red-500' : 'text-[#1b3a6b]'}`}>
+                          {item.hours}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-center py-8 text-gray-400">
+                    Please select a doctor to view schedule
+                  </div>
+                )}
               </div>
               <div className="border-t border-gray-200 my-6 relative">
                 <div className="absolute left-1/2 transform -translate-x-1/2 -top-3 bg-white px-2 text-xs text-gray-400">24/7</div>

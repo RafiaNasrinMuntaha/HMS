@@ -2,10 +2,10 @@ import { useState } from 'react';
 import { 
   FaHeartbeat, 
   FaHandHoldingHeart, 
-  FaUserNurse,       // for Always Caring
-  FaAward,           // for 5-Star Care
-  FaHandshake,       // for Believe in Us
-  FaMedal,           // for A Legacy of Excellence
+  FaUserNurse, 
+  FaAward, 
+  FaHandshake, 
+  FaMedal, 
   FaQuoteLeft 
 } from 'react-icons/fa';
 import { Link } from "react-router-dom";
@@ -90,7 +90,7 @@ const AboutPage = () => {
 
   return (
     <div className="bg-white">
-      {/* Hero Section with Background Image */}
+      {/* Hero Section */}
       <div className="relative py-12 overflow-hidden bg-cover bg-center bg-no-repeat" 
            style={{ backgroundImage: "url('https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80')" }}>
         <div className="absolute inset-0 bg-black/50"></div>
@@ -117,7 +117,7 @@ const AboutPage = () => {
           <div className="w-24 h-1 bg-gray-200 mx-auto rounded-full"></div>
         </div>
 
-        {/* Feature Cards with Modal */}
+        {/* Feature Cards with "Show more" on hover */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-20">
           {features.map((feature, idx) => (
             <div 
@@ -132,6 +132,12 @@ const AboutPage = () => {
               </div>
               <h3 className="text-xl font-bold text-gray-800 mb-2 text-center group-hover:text-[#1b3a6b] transition-colors">{feature.title}</h3>
               <p className="text-gray-600 text-center leading-relaxed group-hover:text-gray-700">{feature.desc}</p>
+              {/* "Show more" indicator that fades in on hover */}
+              <div className="mt-3 text-center">
+                <span className="inline-flex items-center gap-1 text-sm text-[#1b3a6b] font-medium opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                  Click for details <span className="text-base">→</span>
+                </span>
+              </div>
             </div>
           ))}
         </div>
