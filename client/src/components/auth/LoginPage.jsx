@@ -24,7 +24,7 @@ export default function LoginPage() {
       return;
     }
     // TODO: connect to backend
-    navigate("/");
+    navigate("/patient/dashboard");
   };
 
   return (
