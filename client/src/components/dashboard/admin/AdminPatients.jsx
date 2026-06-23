@@ -1,57 +1,45 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { FaEye, FaTimes } from "react-icons/fa";
-
-const patients = [
-  {
-    id: 1,
-    name: "John Doe",
-    email: "john@example.com",
-    phone: "+880 1711-000001",
-    gender: "Male",
-    dob: "1990-05-15",
-    visits: 3,
-  },
-  {
-    id: 2,
-    name: "Sara Islam",
-    email: "sara@example.com",
-    phone: "+880 1711-000002",
-    gender: "Female",
-    dob: "1995-08-22",
-    visits: 5,
-  },
-  {
-    id: 3,
-    name: "Rahim Uddin",
-    email: "rahim@example.com",
-    phone: "+880 1711-000003",
-    gender: "Male",
-    dob: "1985-03-10",
-    visits: 1,
-  },
-  {
-    id: 4,
-    name: "Nadia Haque",
-    email: "nadia@example.com",
-    phone: "+880 1711-000004",
-    gender: "Female",
-    dob: "2000-11-30",
-    visits: 2,
-  },
-  {
-    id: 5,
-    name: "Karim Ali",
-    email: "karim@example.com",
-    phone: "+880 1711-000005",
-    gender: "Male",
-    dob: "1978-07-04",
-    visits: 8,
-  },
-];
+import { useAuth } from "../../../context/AuthContext";
 
 export default function AdminPatients() {
+  const { token } = useAuth();
+  const [patients, setPatients] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [selected, setSelected] = useState(null);
+  const [selectedVisits, setSelectedVisits] = useState(0);
   const [search, setSearch] = useState("");
+
+  useEffect(() => {
+    const fetchPatients = async () => {
+      try {
+        const res = await fetch("http://localhost:5000/api/auth/patients", {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        const data = await res.json();
+        setPatients(data);
+      } catch (err) {
+        console.error("Failed to fetch patients:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchPatients();
+  }, [token]);
+
+  const handleView = async (patient) => {
+    setSelected(patient);
+    try {
+      const res = await fetch(
+        `http://localhost:5000/api/appointments?patient=${patient._id}`,
+        { headers: { Authorization: `Bearer ${token}` } },
+      );
+      const data = await res.json();
+      setSelectedVisits(data.length);
+    } catch {
+      setSelectedVisits(0);
+    }
+  };
 
   const filtered = patients.filter(
     (p) =>
@@ -70,64 +58,80 @@ export default function AdminPatients() {
           placeholder="Search by name or email..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          className="border border-gray-200 rounded-lg px-4 py-2 text-sm outline-none focus:border-accent transition-colors w-64"
+          className="border border-gray-200 rounded-lg px-4 py-2 text-sm outline-none focus:border-accent w-64"
         />
       </div>
 
       <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-        <table className="w-full text-sm">
-          <thead className="bg-gray-50 border-b border-gray-100">
-            <tr>
-              {[
-                "Name",
-                "Email",
-                "Phone",
-                "Gender",
-                "Total Visits",
-                "Action",
-              ].map((h) => (
-                <th
-                  key={h}
-                  className="text-left px-5 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wide"
-                >
-                  {h}
-                </th>
-              ))}
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-gray-50">
-            {filtered.length === 0 ? (
+        {loading ? (
+          <div className="text-center py-10 text-gray-400 text-sm">
+            Loading...
+          </div>
+        ) : (
+          <table className="w-full text-sm">
+            <thead className="bg-gray-50 border-b border-gray-100">
               <tr>
-                <td colSpan={6} className="text-center py-10 text-gray-400">
-                  No patients found.
-                </td>
+                {[
+                  "Name",
+                  "Email",
+                  "Phone",
+                  "Date of Birth",
+                  "Blood Group",
+                  "Action",
+                ].map((h) => (
+                  <th
+                    key={h}
+                    className="text-left px-5 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wide"
+                  >
+                    {h}
+                  </th>
+                ))}
               </tr>
-            ) : (
-              filtered.map((p) => (
-                <tr key={p.id} className="hover:bg-gray-50 transition-colors">
-                  <td className="px-5 py-4 font-medium text-primary">
-                    {p.name}
-                  </td>
-                  <td className="px-5 py-4 text-gray-500">{p.email}</td>
-                  <td className="px-5 py-4 text-gray-500">{p.phone}</td>
-                  <td className="px-5 py-4 text-gray-500">{p.gender}</td>
-                  <td className="px-5 py-4 text-gray-500">{p.visits}</td>
-                  <td className="px-5 py-4">
-                    <button
-                      onClick={() => setSelected(p)}
-                      className="text-xs text-blue-500 border border-blue-200 px-3 py-1 rounded-full hover:bg-blue-50 transition-colors flex items-center gap-1"
-                    >
-                      <FaEye size={11} /> View
-                    </button>
+            </thead>
+            <tbody className="divide-y divide-gray-50">
+              {filtered.length === 0 ? (
+                <tr>
+                  <td colSpan={6} className="text-center py-10 text-gray-400">
+                    No patients found.
                   </td>
                 </tr>
-              ))
-            )}
-          </tbody>
-        </table>
+              ) : (
+                filtered.map((p) => (
+                  <tr
+                    key={p._id}
+                    className="hover:bg-gray-50 transition-colors"
+                  >
+                    <td className="px-5 py-4 font-medium text-primary">
+                      {p.name}
+                    </td>
+                    <td className="px-5 py-4 text-gray-500">{p.email}</td>
+                    <td className="px-5 py-4 text-gray-500">
+                      {p.phone || "—"}
+                    </td>
+                    <td className="px-5 py-4 text-gray-500">
+                      {p.dateOfBirth
+                        ? new Date(p.dateOfBirth).toLocaleDateString()
+                        : "—"}
+                    </td>
+                    <td className="px-5 py-4 text-gray-500">
+                      {p.bloodGroup || "—"}
+                    </td>
+                    <td className="px-5 py-4">
+                      <button
+                        onClick={() => handleView(p)}
+                        className="text-xs text-blue-500 border border-blue-200 px-3 py-1 rounded-full hover:bg-blue-50 flex items-center gap-1"
+                      >
+                        <FaEye size={11} /> View
+                      </button>
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        )}
       </div>
 
-      {/* Patient Detail Modal */}
       {selected && (
         <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
           <div className="bg-white rounded-xl p-8 max-w-md w-full mx-4 shadow-xl">
@@ -146,10 +150,15 @@ export default function AdminPatients() {
               {[
                 { label: "Full Name", value: selected.name },
                 { label: "Email", value: selected.email },
-                { label: "Phone", value: selected.phone },
-                { label: "Gender", value: selected.gender },
-                { label: "Date of Birth", value: selected.dob },
-                { label: "Total Visits", value: selected.visits },
+                { label: "Phone", value: selected.phone || "—" },
+                {
+                  label: "Date of Birth",
+                  value: selected.dateOfBirth
+                    ? new Date(selected.dateOfBirth).toLocaleDateString()
+                    : "—",
+                },
+                { label: "Blood Group", value: selected.bloodGroup || "—" },
+                { label: "Total Visits", value: selectedVisits },
               ].map(({ label, value }) => (
                 <div
                   key={label}

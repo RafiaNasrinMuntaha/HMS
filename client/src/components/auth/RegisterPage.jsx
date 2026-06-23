@@ -8,6 +8,8 @@ import {
   FaEye,
   FaEyeSlash,
 } from "react-icons/fa";
+import { useAuth } from "../../context/AuthContext";
+import { registerApi } from "../../services/authService.js";
 
 export default function RegisterPage() {
   const [form, setForm] = useState({
@@ -15,29 +17,55 @@ export default function RegisterPage() {
     email: "",
     phone: "",
     dob: "",
-    gender: "",
     password: "",
     confirm: "",
   });
   const [showPass, setShowPass] = useState(false);
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  const { login } = useAuth();
   const navigate = useNavigate();
 
   const handleChange = (e) =>
     setForm({ ...form, [e.target.name]: e.target.value });
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    setError("");
+
     if (form.password !== form.confirm) {
       setError("Passwords do not match.");
       return;
     }
-    if (form.password.length < 8) {
-      setError("Password must be at least 8 characters.");
+    if (form.password.length < 6) {
+      setError("Password must be at least 6 characters.");
       return;
     }
-    // TODO: connect to backend
-    navigate("/login");
+
+    setLoading(true);
+    try {
+      // Replaced manual fetch block with abstract API service call
+      const data = await registerApi({
+        name: form.name,
+        email: form.email,
+        phone: form.phone,
+        dateOfBirth: form.dob,
+        password: form.password,
+      });
+
+      // Auto-login after register using context hook
+      login(
+        { _id: data._id, name: data.name, email: data.email, role: data.role },
+        data.token,
+      );
+
+      navigate("/patient/dashboard");
+    } catch (err) {
+      setError(err.message || "Registration failed");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -54,7 +82,6 @@ export default function RegisterPage() {
           </p>
         </div>
 
-        {/* Card */}
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8">
           {error && (
             <div className="bg-red-50 text-red-600 text-sm px-4 py-3 rounded-lg mb-5">
@@ -116,7 +143,7 @@ export default function RegisterPage() {
                     name="phone"
                     value={form.phone}
                     onChange={handleChange}
-                    placeholder="+1 234 567"
+                    placeholder="+880 1711..."
                     required
                     className="flex-1 py-3 pr-2 text-sm outline-none text-primary"
                   />
@@ -124,38 +151,19 @@ export default function RegisterPage() {
               </div>
             </div>
 
-            {/* DOB + Gender */}
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="text-sm font-medium text-primary block mb-1.5">
-                  Date of Birth
-                </label>
-                <input
-                  name="dob"
-                  type="date"
-                  value={form.dob}
-                  onChange={handleChange}
-                  required
-                  className="w-full border border-gray-200 rounded-lg px-4 py-3 text-sm outline-none focus:border-accent transition-colors text-primary"
-                />
-              </div>
-              <div>
-                <label className="text-sm font-medium text-primary block mb-1.5">
-                  Gender
-                </label>
-                <select
-                  name="gender"
-                  value={form.gender}
-                  onChange={handleChange}
-                  required
-                  className="w-full border border-gray-200 rounded-lg px-4 py-3 text-sm outline-none focus:border-accent transition-colors text-primary bg-white"
-                >
-                  <option value="">Select</option>
-                  <option>Male</option>
-                  <option>Female</option>
-                  <option>Other</option>
-                </select>
-              </div>
+            {/* DOB */}
+            <div>
+              <label className="text-sm font-medium text-primary block mb-1.5">
+                Date of Birth
+              </label>
+              <input
+                name="dob"
+                type="date"
+                value={form.dob}
+                onChange={handleChange}
+                required
+                className="w-full border border-gray-200 rounded-lg px-4 py-3 text-sm outline-none focus:border-accent transition-colors text-primary"
+              />
             </div>
 
             {/* Password */}
@@ -172,7 +180,7 @@ export default function RegisterPage() {
                   type={showPass ? "text" : "password"}
                   value={form.password}
                   onChange={handleChange}
-                  placeholder="Min. 8 characters"
+                  placeholder="Min. 6 characters"
                   required
                   className="flex-1 py-3 text-sm outline-none text-primary"
                 />
@@ -207,12 +215,12 @@ export default function RegisterPage() {
               </div>
             </div>
 
-            {/* Submit */}
             <button
               type="submit"
-              className="w-full bg-primary text-white font-semibold py-3 rounded-lg hover:bg-accent transition-all duration-200 mt-2"
+              disabled={loading}
+              className="w-full bg-primary text-white font-semibold py-3 rounded-lg hover:bg-accent transition-all duration-200 mt-2 disabled:opacity-60"
             >
-              Create Account
+              {loading ? "Creating account..." : "Create Account"}
             </button>
           </form>
 

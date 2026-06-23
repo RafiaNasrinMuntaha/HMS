@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   FaUser,
   FaEnvelope,
@@ -7,19 +7,25 @@ import {
   FaEye,
   FaEyeSlash,
 } from "react-icons/fa";
+import { useAuth } from "../../../context/AuthContext";
+import {
+  updateProfileApi,
+  changePasswordApi,
+} from "../../../services/authService.js";
 
 export default function PatientProfile() {
+  const { user, token, login } = useAuth();
   const [tab, setTab] = useState("info");
-  const [saved, setSaved] = useState(false);
 
   const [profile, setProfile] = useState({
-    name: "John Doe",
-    email: "john@example.com",
-    phone: "+880 1711-000000",
-    dob: "1990-05-15",
-    gender: "Male",
-    emergency: "+880 1811-000000",
+    name: "",
+    email: "",
+    phone: "",
+    dateOfBirth: "",
   });
+  const [saving, setSaving] = useState(false);
+  const [saved, setSaved] = useState(false);
+  const [profileError, setProfileError] = useState("");
 
   const [passwords, setPasswords] = useState({
     current: "",
@@ -33,27 +39,70 @@ export default function PatientProfile() {
   });
   const [passError, setPassError] = useState("");
   const [passSaved, setPassSaved] = useState(false);
+  const [passLoading, setPassLoading] = useState(false);
 
-  const handleProfileSave = (e) => {
+  // Load current user data into form
+  useEffect(() => {
+    if (user) {
+      setProfile({
+        name: user.name || "",
+        email: user.email || "",
+        phone: user.phone || "",
+        dateOfBirth: user.dateOfBirth?.split("T")[0] || "",
+      });
+    }
+  }, [user]);
+
+  const handleProfileSave = async (e) => {
     e.preventDefault();
-    setSaved(true);
-    setTimeout(() => setSaved(false), 3000);
+    setSaving(true);
+    setProfileError("");
+
+    try {
+      const data = await updateProfileApi(profile, token);
+
+      // Update context with new data
+      login({ ...user, name: data.name, email: data.email }, token);
+      setSaved(true);
+      setTimeout(() => setSaved(false), 3000);
+    } catch (err) {
+      setProfileError(err.message);
+    } finally {
+      setSaving(false);
+    }
   };
 
-  const handlePasswordSave = (e) => {
+  const handlePasswordSave = async (e) => {
     e.preventDefault();
+    setPassError("");
+
     if (passwords.newPass !== passwords.confirm) {
       setPassError("Passwords do not match.");
       return;
     }
-    if (passwords.newPass.length < 8) {
-      setPassError("Minimum 8 characters.");
+    if (passwords.newPass.length < 6) {
+      setPassError("Minimum 6 characters.");
       return;
     }
-    setPassError("");
-    setPassSaved(true);
-    setPasswords({ current: "", newPass: "", confirm: "" });
-    setTimeout(() => setPassSaved(false), 3000);
+
+    setPassLoading(true);
+    try {
+      await changePasswordApi(
+        {
+          currentPassword: passwords.current,
+          newPassword: passwords.newPass,
+        },
+        token,
+      );
+
+      setPassSaved(true);
+      setPasswords({ current: "", newPass: "", confirm: "" });
+      setTimeout(() => setPassSaved(false), 3000);
+    } catch (err) {
+      setPassError(err.message);
+    } finally {
+      setPassLoading(false);
+    }
   };
 
   const toggleShow = (field) =>
@@ -75,11 +124,7 @@ export default function PatientProfile() {
             key={id}
             onClick={() => setTab(id)}
             className={`px-5 py-2 rounded-full text-sm font-medium transition-all
-              ${
-                tab === id
-                  ? "bg-primary text-white"
-                  : "bg-white text-primary border border-gray-200 hover:border-primary"
-              }`}
+                ${tab === id ? "bg-primary text-white" : "bg-white text-primary border border-gray-200 hover:border-primary"}`}
           >
             {label}
           </button>
@@ -92,7 +137,12 @@ export default function PatientProfile() {
           <form onSubmit={handleProfileSave} className="space-y-5">
             {saved && (
               <div className="bg-green-50 text-green-600 text-sm px-4 py-3 rounded-lg">
-                ✓ Profile updated successfully!
+                ✓ Profile updated!
+              </div>
+            )}
+            {profileError && (
+              <div className="bg-red-50 text-red-600 text-sm px-4 py-3 rounded-lg">
+                {profileError}
               </div>
             )}
 
@@ -100,7 +150,7 @@ export default function PatientProfile() {
               <label className="text-sm font-medium text-primary block mb-1.5">
                 Full Name
               </label>
-              <div className="flex items-center border border-gray-200 rounded-lg overflow-hidden focus-within:border-accent transition-colors">
+              <div className="flex items-center border border-gray-200 rounded-lg overflow-hidden focus-within:border-accent">
                 <span className="px-3 text-gray-400">
                   <FaUser size={14} />
                 </span>
@@ -110,6 +160,7 @@ export default function PatientProfile() {
                     setProfile({ ...profile, name: e.target.value })
                   }
                   className="flex-1 py-3 pr-4 text-sm outline-none text-primary"
+                  required
                 />
               </div>
             </div>
@@ -119,7 +170,7 @@ export default function PatientProfile() {
                 <label className="text-sm font-medium text-primary block mb-1.5">
                   Email
                 </label>
-                <div className="flex items-center border border-gray-200 rounded-lg overflow-hidden focus-within:border-accent transition-colors">
+                <div className="flex items-center border border-gray-200 rounded-lg overflow-hidden focus-within:border-accent">
                   <span className="px-3 text-gray-400">
                     <FaEnvelope size={14} />
                   </span>
@@ -130,6 +181,7 @@ export default function PatientProfile() {
                       setProfile({ ...profile, email: e.target.value })
                     }
                     className="flex-1 py-3 pr-2 text-sm outline-none text-primary"
+                    required
                   />
                 </div>
               </div>
@@ -137,7 +189,7 @@ export default function PatientProfile() {
                 <label className="text-sm font-medium text-primary block mb-1.5">
                   Phone
                 </label>
-                <div className="flex items-center border border-gray-200 rounded-lg overflow-hidden focus-within:border-accent transition-colors">
+                <div className="flex items-center border border-gray-200 rounded-lg overflow-hidden focus-within:border-accent">
                   <span className="px-3 text-gray-400">
                     <FaPhone size={14} />
                   </span>
@@ -152,61 +204,26 @@ export default function PatientProfile() {
               </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="text-sm font-medium text-primary block mb-1.5">
-                  Date of Birth
-                </label>
-                <input
-                  type="date"
-                  value={profile.dob}
-                  onChange={(e) =>
-                    setProfile({ ...profile, dob: e.target.value })
-                  }
-                  className="w-full border border-gray-200 rounded-lg px-4 py-3 text-sm outline-none focus:border-accent transition-colors text-primary"
-                />
-              </div>
-              <div>
-                <label className="text-sm font-medium text-primary block mb-1.5">
-                  Gender
-                </label>
-                <select
-                  value={profile.gender}
-                  onChange={(e) =>
-                    setProfile({ ...profile, gender: e.target.value })
-                  }
-                  className="w-full border border-gray-200 rounded-lg px-4 py-3 text-sm outline-none focus:border-accent transition-colors text-primary bg-white"
-                >
-                  <option>Male</option>
-                  <option>Female</option>
-                  <option>Other</option>
-                </select>
-              </div>
-            </div>
-
             <div>
               <label className="text-sm font-medium text-primary block mb-1.5">
-                Emergency Contact
+                Date of Birth
               </label>
-              <div className="flex items-center border border-gray-200 rounded-lg overflow-hidden focus-within:border-accent transition-colors">
-                <span className="px-3 text-gray-400">
-                  <FaPhone size={14} />
-                </span>
-                <input
-                  value={profile.emergency}
-                  onChange={(e) =>
-                    setProfile({ ...profile, emergency: e.target.value })
-                  }
-                  className="flex-1 py-3 pr-4 text-sm outline-none text-primary"
-                />
-              </div>
+              <input
+                type="date"
+                value={profile.dateOfBirth}
+                onChange={(e) =>
+                  setProfile({ ...profile, dateOfBirth: e.target.value })
+                }
+                className="w-full border border-gray-200 rounded-lg px-4 py-3 text-sm outline-none focus:border-accent text-primary"
+              />
             </div>
 
             <button
               type="submit"
-              className="bg-primary text-white font-semibold px-8 py-3 rounded-lg hover:bg-accent transition-all duration-200 text-sm"
+              disabled={saving}
+              className="bg-primary text-white font-semibold px-8 py-3 rounded-lg hover:bg-accent transition-all text-sm disabled:opacity-60"
             >
-              Save Changes
+              {saving ? "Saving..." : "Save Changes"}
             </button>
           </form>
         )}
@@ -234,7 +251,7 @@ export default function PatientProfile() {
               {
                 field: "newPass",
                 label: "New Password",
-                placeholder: "Min. 8 characters",
+                placeholder: "Min. 6 characters",
               },
               {
                 field: "confirm",
@@ -246,7 +263,7 @@ export default function PatientProfile() {
                 <label className="text-sm font-medium text-primary block mb-1.5">
                   {label}
                 </label>
-                <div className="flex items-center border border-gray-200 rounded-lg overflow-hidden focus-within:border-accent transition-colors">
+                <div className="flex items-center border border-gray-200 rounded-lg overflow-hidden focus-within:border-accent">
                   <span className="px-3 text-gray-400">
                     <FaLock size={14} />
                   </span>
@@ -263,7 +280,7 @@ export default function PatientProfile() {
                   <button
                     type="button"
                     onClick={() => toggleShow(field)}
-                    className="px-3 text-gray-400 hover:text-primary transition-colors"
+                    className="px-3 text-gray-400 hover:text-primary"
                   >
                     {showPass[field] ? (
                       <FaEyeSlash size={14} />
@@ -277,9 +294,10 @@ export default function PatientProfile() {
 
             <button
               type="submit"
-              className="bg-primary text-white font-semibold px-8 py-3 rounded-lg hover:bg-accent transition-all duration-200 text-sm"
+              disabled={passLoading}
+              className="bg-primary text-white font-semibold px-8 py-3 rounded-lg hover:bg-accent transition-all text-sm disabled:opacity-60"
             >
-              Update Password
+              {passLoading ? "Updating..." : "Update Password"}
             </button>
           </form>
         )}

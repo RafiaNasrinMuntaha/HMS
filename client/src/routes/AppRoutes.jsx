@@ -1,9 +1,14 @@
 import React from "react";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Navigate,
+} from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 import PublicLayout from "../layouts/PublicLayout";
 import ScrollToTop from "../components/common/ScrollToTop";
 
-// Public Pages (Located in components/pages)
 import HomePage from "../components/pages/HomePage";
 import AboutPage from "../components/pages/AboutPage";
 import AppointmentPage from "../components/pages/AppointmentPage";
@@ -14,20 +19,42 @@ import NewsPage from "../components/pages/NewsPage";
 import NewsDetailPage from "../components/pages/NewsDetailPage";
 import ContactPage from "../components/pages/ContactPage";
 
-// Auth Pages (Located in components/auth)
 import LoginPage from "../components/auth/LoginPage";
 import RegisterPage from "../components/auth/RegisterPage";
 
-// Dashboard Components (Located in components/dashboard)
 import PatientDashboard from "../components/dashboard/patient/PatientDashboard";
 import AdminDashboard from "../components/dashboard/admin/AdminDashboard";
+
+// Blocks access if not logged in
+const ProtectedRoute = ({ children }) => {
+  const { isLoggedIn, loading } = useAuth();
+  if (loading)
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        Loading...
+      </div>
+    );
+  return isLoggedIn ? children : <Navigate to="/login" replace />;
+};
+
+// Blocks access if not admin
+const AdminRoute = ({ children }) => {
+  const { isAdmin, loading } = useAuth();
+  if (loading)
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        Loading...
+      </div>
+    );
+  return isAdmin ? children : <Navigate to="/login" replace />;
+};
 
 export default function AppRoutes() {
   return (
     <Router>
       <ScrollToTop />
       <Routes>
-        {/* Public Routes with Shared Layout (Navbar, Footer, etc.) */}
+        {/* Public Routes */}
         <Route path="/" element={<PublicLayout />}>
           <Route index element={<HomePage />} />
           <Route path="about" element={<AboutPage />} />
@@ -40,15 +67,29 @@ export default function AppRoutes() {
           <Route path="appointment" element={<AppointmentPage />} />
         </Route>
 
-        {/* Auth Routes (Standalone Pages without Public Layout) */}
+        {/* Auth Routes */}
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
 
-        {/* Patient Routes (Standalone Pages without Public Layout) */}
-        <Route path="/patient/dashboard" element={<PatientDashboard />} />
+        {/* Patient Routes — requires login */}
+        <Route
+          path="/patient/dashboard"
+          element={
+            <ProtectedRoute>
+              <PatientDashboard />
+            </ProtectedRoute>
+          }
+        />
 
-        {/* Admin Routes (Standalone Pages without Public Layout) */}
-        <Route path="/admin/dashboard" element={<AdminDashboard />} />
+        {/* Admin Routes — requires admin role */}
+        <Route
+          path="/admin/dashboard"
+          element={
+            <AdminRoute>
+              <AdminDashboard />
+            </AdminRoute>
+          }
+        />
       </Routes>
     </Router>
   );

@@ -1,6 +1,14 @@
 import { useState } from "react";
-import { FaHome, FaCalendarAlt, FaUser, FaSignOutAlt } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../../../context/AuthContext";
+import {
+  FaHome,
+  FaCalendarAlt,
+  FaUser,
+  FaSignOutAlt,
+  FaArrowLeft, // ✅ Added FaArrowLeft to the icon pool
+} from "react-icons/fa";
+
 import PatientOverview from "./PatientOverview";
 import PatientAppoinments from "./PatientAppoinments";
 import PatientProfile from "./PatientProfile";
@@ -13,7 +21,13 @@ const menuItems = [
 
 export default function PatientDashboard() {
   const [active, setActive] = useState("overview");
+  const { user, logout } = useAuth();
   const navigate = useNavigate();
+
+  const handleLogout = () => {
+    logout();
+    navigate("/");
+  };
 
   const renderContent = () => {
     switch (active) {
@@ -40,6 +54,14 @@ export default function PatientDashboard() {
           <p className="text-blue-200 text-xs mt-1">Patient Portal</p>
         </div>
 
+        {/* User info */}
+        <div className="px-6 py-4 border-b border-white/10">
+          <p className="text-white font-semibold text-sm truncate">
+            {user?.name}
+          </p>
+          <p className="text-blue-200 text-xs truncate">{user?.email}</p>
+        </div>
+
         <nav className="flex-1 px-4 py-6 space-y-2">
           {menuItems.map(({ id, label, icon: Icon }) => (
             <button
@@ -58,9 +80,17 @@ export default function PatientDashboard() {
           ))}
         </nav>
 
-        <div className="px-4 py-6 border-t border-white/10">
+        {/* ✅ Bottom actions layout updated with Go to Home and Sign Out */}
+        <div className="px-4 py-6 border-t border-white/10 space-y-1">
           <button
             onClick={() => navigate("/")}
+            className="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium text-blue-200 hover:bg-white/10 hover:text-white transition-all"
+          >
+            <FaArrowLeft size={16} />
+            Go to Home
+          </button>
+          <button
+            onClick={handleLogout}
             className="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium text-blue-200 hover:bg-white/10 hover:text-white transition-all"
           >
             <FaSignOutAlt size={16} />
@@ -69,7 +99,6 @@ export default function PatientDashboard() {
         </div>
       </aside>
 
-      {/* Main Content */}
       <main className="ml-64 flex-1 p-8">{renderContent()}</main>
     </div>
   );

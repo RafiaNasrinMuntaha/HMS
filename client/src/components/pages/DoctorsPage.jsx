@@ -1,6 +1,7 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import DoctorGrid, { doctors } from "../../components/doctors/DoctorGrid";
+import DoctorGrid from "../../components/doctors/DoctorGrid";
+import { getDoctorsApi } from "../../services/doctorService.js";
 
 const departments = [
   "All",
@@ -20,15 +21,29 @@ const DoctorsPage = () => {
   const navigate = useNavigate();
   const [search, setSearch] = useState("");
   const [selectedDept, setSelectedDept] = useState("All");
+  const [doctors, setDoctors] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  const filtered = doctors.filter((doctor) => {
-    const matchesSearch = doctor.name
-      .toLowerCase()
-      .includes(search.toLowerCase());
-    const matchesDept =
-      selectedDept === "All" || doctor.department === selectedDept;
-    return matchesSearch && matchesDept;
-  });
+  useEffect(() => {
+    const fetchDoctors = async () => {
+      setLoading(true);
+      try {
+        const params = {};
+        if (search) params.search = search;
+        if (selectedDept !== "All") params.department = selectedDept;
+
+        const data = await getDoctorsApi(params);
+        setDoctors(data);
+      } catch (err) {
+        console.error("Failed to fetch doctors:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    const timer = setTimeout(fetchDoctors, 300);
+    return () => clearTimeout(timer);
+  }, [search, selectedDept]);
 
   return (
     <div>
@@ -37,7 +52,7 @@ const DoctorsPage = () => {
         className="relative py-10 sm:py-12 px-4 sm:px-6"
         style={{
           backgroundImage:
-            "url(https://images.unsplash.com/photo-1504813184591-01572f98c85f?w=1600&q=80)",
+            "ur[](https://images.unsplash.com/photo-1504813184591-01572f98c85f?w=1600&q=80)",
           backgroundSize: "cover",
           backgroundPosition: "center",
         }}
@@ -70,7 +85,6 @@ const DoctorsPage = () => {
               </option>
             ))}
           </select>
-
           <input
             type="text"
             placeholder="Search by doctor name"
@@ -83,12 +97,18 @@ const DoctorsPage = () => {
 
       {/* Content */}
       <div className="max-w-6xl mx-auto px-4 sm:px-6 py-10">
-        <p className="text-gray-500 text-sm mb-6">
-          Showing{" "}
-          <span className="font-bold text-[#1B3C6B]">{filtered.length}</span>{" "}
-          doctors
-        </p>
-        <DoctorGrid filtered={filtered} />
+        {loading ? (
+          <p className="text-gray-400 text-sm">Loading doctors...</p>
+        ) : (
+          <>
+            <p className="text-gray-500 text-sm mb-6">
+              Showing{" "}
+              <span className="font-bold text-[#1B3C6B]">{doctors.length}</span>{" "}
+              doctors
+            </p>
+            <DoctorGrid filtered={doctors} />
+          </>
+        )}
       </div>
     </div>
   );

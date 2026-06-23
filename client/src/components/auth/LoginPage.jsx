@@ -1,30 +1,58 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { FaEnvelope, FaLock, FaEye, FaEyeSlash } from "react-icons/fa";
+import { useAuth } from "../../context/AuthContext";
+import { loginApi } from "../../services/authService.js";
 
 export default function LoginPage() {
-  const [form, setForm] = useState({
-    email: "",
-    password: "",
-    remember: false,
-  });
+  const [form, setForm] = useState({ email: "", password: "" });
   const [showPass, setShowPass] = useState(false);
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  const { login } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
 
-  const handleChange = (e) => {
-    const { name, value, type, checked } = e.target;
-    setForm({ ...form, [name]: type === "checkbox" ? checked : value });
-  };
+  // Redirect back to where they came from, or role-based dashboard
+  const from = location.state?.from || null;
 
-  const handleSubmit = (e) => {
+  const handleChange = (e) =>
+    setForm({ ...form, [e.target.name]: e.target.value });
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    setError("");
+
     if (!form.email || !form.password) {
       setError("Please fill in all fields.");
       return;
     }
-    // TODO: connect to backend
-    navigate("/patient/dashboard");
+
+    setLoading(true);
+    try {
+      // Replaced the manual fetch block with your clean auth service utility
+      const data = await loginApi(form.email, form.password);
+
+      // Store user and token via context
+      login(
+        { _id: data._id, name: data.name, email: data.email, role: data.role },
+        data.token,
+      );
+
+      // Redirect based on role
+      if (from) {
+        navigate(from);
+      } else if (data.role === "admin") {
+        navigate("/admin/dashboard");
+      } else {
+        navigate("/patient/dashboard");
+      }
+    } catch (err) {
+      setError(err.message || "Login failed");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -39,7 +67,6 @@ export default function LoginPage() {
           <p className="text-gray-500 text-sm mt-2">Sign in to your account</p>
         </div>
 
-        {/* Card */}
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8">
           {error && (
             <div className="bg-red-50 text-red-600 text-sm px-4 py-3 rounded-lg mb-5">
@@ -95,40 +122,21 @@ export default function LoginPage() {
               </div>
             </div>
 
-            {/* Remember + Forgot */}
-            <div className="flex items-center justify-between text-sm">
-              <label className="flex items-center gap-2 text-gray-600 cursor-pointer">
-                <input
-                  type="checkbox"
-                  name="remember"
-                  checked={form.remember}
-                  onChange={handleChange}
-                  className="accent-primary"
-                />
-                Remember me
-              </label>
-              <a href="#" className="text-accent hover:underline">
-                Forgot password?
-              </a>
-            </div>
-
-            {/* Submit */}
             <button
               type="submit"
-              className="w-full bg-primary text-white font-semibold py-3 rounded-lg hover:bg-accent transition-all duration-200"
+              disabled={loading}
+              className="w-full bg-primary text-white font-semibold py-3 rounded-lg hover:bg-accent transition-all duration-200 disabled:opacity-60"
             >
-              Sign In
+              {loading ? "Signing in..." : "Sign In"}
             </button>
           </form>
 
-          {/* Divider */}
           <div className="flex items-center gap-3 my-6">
             <hr className="flex-1 border-gray-200" />
             <span className="text-gray-400 text-xs">or</span>
             <hr className="flex-1 border-gray-200" />
           </div>
 
-          {/* Patient ID login option */}
           <p className="text-center text-sm text-gray-500">
             Don't have an account?{" "}
             <Link

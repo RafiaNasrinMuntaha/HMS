@@ -1,55 +1,31 @@
-import { FaEye, FaHeart } from "react-icons/fa";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-
-const news = [
-  {
-    id: 1,
-    date: "Monday 05, January 2026",
-    author: "Professor Dr Shaikh Md Hasan Mamun",
-    title: "The Importance of Regular Heart Checkups",
-    views: 68,
-    likes: 86,
-    image:
-      "https://images.unsplash.com/photo-1628348068343-c6a848d2b6dd?w=600&q=80",
-  },
-  {
-    id: 2,
-    date: "Tuesday 24, February 2026",
-    author: "Dr. Rehnuma Rashid",
-    title: "Understanding DNA Testing and What It Means for You",
-    views: 54,
-    likes: 72,
-    image:
-      "https://images.unsplash.com/photo-1532187863486-abf9dbad1b69?w=600&q=80",
-  },
-  {
-    id: 3,
-    date: "Sunday 15, March 2026",
-    author: "Dr. S M Ali Ahsan",
-    title: "Why Free Checkups Save Lives",
-    views: 91,
-    likes: 110,
-    image:
-      "https://images.unsplash.com/photo-1579684385127-1ef15d508118?w=600&q=80",
-  },
-  {
-  id: 4,
-  date: "Saturday 18, April 2026",
-  author: "Dr. Rahul Bhan",
-  title: "Recovering From Joint Replacement Surgery: What to Expect",
-  views: 63,
-  likes: 88,
-  image: "https://images.unsplash.com/photo-1551601651-2a8555f1a136?w=600&q=80",
-},
-];
 
 export default function NewsGrid() {
   const navigate = useNavigate();
+  const [news, setNews] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchNews = async () => {
+      try {
+        const res = await fetch(
+          "http://localhost:5000/api/news?limit=4&page=1",
+        );
+        const data = await res.json();
+        setNews(data.news);
+      } catch (err) {
+        console.error("Failed to fetch news:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchNews();
+  }, []);
 
   return (
     <section className="py-20 px-6 bg-white">
       <div className="max-w-7xl mx-auto">
-        {/* Header */}
         <div className="text-center mb-12">
           <p className="text-accent font-semibold tracking-widest text-sm uppercase mb-2">
             Better Information, Better Health
@@ -57,40 +33,49 @@ export default function NewsGrid() {
           <h2 className="text-4xl font-heading font-bold text-primary">News</h2>
         </div>
 
-        {/* 2x2 Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {news.map((item, i) => (
-            <div
-              key={i}
-              onClick={() => navigate(`/news/${item.id}`)}
-              className="flex gap-4 items-start cursor-pointer group"
-            >
-              <img
-                src={item.image}
-                alt={item.title}
-                className="w-32 h-24 object-cover rounded flex-shrink-0 group-hover:opacity-80 transition-opacity"
-              />
-              <div>
-                <p className="text-accent text-xs mb-1">
-                  {item.date} | By {item.author}
-                </p>
-                <p className="text-primary font-medium text-sm mb-2 leading-snug group-hover:text-accent transition-colors">
-                  {item.title}
-                </p>
-                <div className="flex items-center gap-4 text-gray-400 text-xs">
-                  <span className="flex items-center gap-1">
-                    <FaEye /> {item.views}
-                  </span>
-                  <span className="flex items-center gap-1">
-                    <FaHeart /> {item.likes}
+        {loading ? (
+          <div className="text-center text-gray-400 py-10">Loading news...</div>
+        ) : news.length === 0 ? (
+          <div className="text-center text-gray-400 py-10">
+            No news posts yet.
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {news.map((item) => (
+              <div
+                key={item._id}
+                onClick={() => navigate(`/news/${item._id}`)}
+                className="flex gap-4 items-start cursor-pointer group"
+              >
+                {item.coverImage && (
+                  <img
+                    src={item.coverImage}
+                    alt={item.title}
+                    className="w-32 h-24 object-cover rounded flex-shrink-0 group-hover:opacity-80 transition-opacity"
+                  />
+                )}
+                <div>
+                  <p className="text-accent text-xs mb-1">
+                    {new Date(item.createdAt).toLocaleDateString("en-US", {
+                      weekday: "long",
+                      day: "2-digit",
+                      month: "long",
+                      year: "numeric",
+                    })}{" "}
+                    | By {item.author?.name || "MediCore"}
+                  </p>
+                  <p className="text-primary font-medium text-sm mb-2 leading-snug group-hover:text-accent transition-colors">
+                    {item.title}
+                  </p>
+                  <span className="text-xs bg-accent/10 text-accent px-2 py-0.5 rounded-full">
+                    {item.category}
                   </span>
                 </div>
               </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        )}
 
-        {/* View All Button */}
         <div className="text-center mt-10">
           <button
             onClick={() => navigate("/news")}

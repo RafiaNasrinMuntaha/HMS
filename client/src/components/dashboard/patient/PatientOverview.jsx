@@ -1,51 +1,75 @@
+import { useState, useEffect } from "react";
 import { FaCalendarAlt, FaCheckCircle, FaClock } from "react-icons/fa";
+import { useAuth } from "../../../context/AuthContext";
+import { getPatientStatsApi } from "../../../services/authService.js";
+import { getMyAppointmentsApi } from "../../../services/appointmentService.js";
 
-const upcomingAppointments = [
-  {
-    id: 1,
-    doctor: "Dr. Asif Ahmed",
-    department: "Cardiology",
-    date: "2026-06-20",
-    time: "10:00 AM",
-    status: "Confirmed",
-  },
-  {
-    id: 2,
-    doctor: "Dr. Fahmida Akhter",
-    department: "Gynaecology",
-    date: "2026-06-25",
-    time: "02:00 PM",
-    status: "Pending",
-  },
-];
-
-const stats = [
-  {
-    label: "Upcoming Appointments",
-    value: 2,
-    icon: FaCalendarAlt,
-    color: "bg-blue-50 text-primary",
-  },
-  {
-    label: "Total Past Visits",
-    value: 8,
-    icon: FaCheckCircle,
-    color: "bg-green-50 text-green-600",
-  },
-  {
-    label: "Pending Requests",
-    value: 1,
-    icon: FaClock,
-    color: "bg-yellow-50 text-yellow-600",
-  },
-];
+const statusStyle = {
+  confirmed: "bg-green-100 text-green-600",
+  pending: "bg-yellow-100 text-yellow-600",
+  completed: "bg-blue-100 text-blue-600",
+  cancelled: "bg-red-100 text-red-500",
+};
 
 export default function PatientOverview({ setActive }) {
+  const { user, token } = useAuth();
+  const [stats, setStats] = useState({ upcoming: 0, past: 0, pending: 0 });
+  const [appointments, setAppointments] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        // Replaced manual fetch statements with cleaner centralized API methods
+        const [statsData, aptsData] = await Promise.all([
+          getPatientStatsApi(token),
+          getMyAppointmentsApi(token),
+        ]);
+
+        setStats(statsData);
+
+        // Show only upcoming appointments in overview (max 3)
+        const upcoming = aptsData
+          .filter((a) => a.status === "pending" || a.status === "confirmed")
+          .slice(0, 3);
+        setAppointments(upcoming);
+      } catch (err) {
+        console.error("Failed to fetch overview data:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchData();
+  }, [token]);
+
+  const statCards = [
+    {
+      label: "Upcoming Appointments",
+      value: stats.upcoming,
+      icon: FaCalendarAlt,
+      color: "bg-blue-50 text-primary",
+    },
+    {
+      label: "Total Past Visits",
+      value: stats.past,
+      icon: FaCheckCircle,
+      color: "bg-green-50 text-green-600",
+    },
+    {
+      label: "Pending Requests",
+      value: stats.pending,
+      icon: FaClock,
+      color: "bg-yellow-50 text-yellow-600",
+    },
+  ];
+
+  if (loading) return <div className="text-gray-400 text-sm">Loading...</div>;
+
   return (
     <div>
       <div className="mb-8">
         <h1 className="text-2xl font-heading font-bold text-primary">
-          Welcome back, John Doe 👋
+          Welcome back, {user?.name} 👋
         </h1>
         <p className="text-gray-500 text-sm mt-1">
           Here's a summary of your health activity.
@@ -54,7 +78,7 @@ export default function PatientOverview({ setActive }) {
 
       {/* Stat Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-5 mb-10">
-        {stats.map(({ label, value, icon: Icon, color }) => (
+        {statCards.map(({ label, value, icon: Icon, color }) => (
           <div
             key={label}
             className="bg-white rounded-xl p-6 shadow-sm border border-gray-100 flex items-center gap-4"
@@ -86,33 +110,40 @@ export default function PatientOverview({ setActive }) {
           </button>
         </div>
 
-        <div className="space-y-4">
-          {upcomingAppointments.map((apt) => (
-            <div
-              key={apt.id}
-              className="flex items-center justify-between p-4 bg-gray-50 rounded-lg"
-            >
-              <div>
-                <p className="text-primary font-medium text-sm">{apt.doctor}</p>
-                <p className="text-gray-400 text-xs">{apt.department}</p>
-              </div>
-              <div className="text-center">
-                <p className="text-primary text-sm font-medium">{apt.date}</p>
-                <p className="text-gray-400 text-xs">{apt.time}</p>
-              </div>
-              <span
-                className={`text-xs font-semibold px-3 py-1 rounded-full
-                ${
-                  apt.status === "Confirmed"
-                    ? "bg-green-100 text-green-600"
-                    : "bg-yellow-100 text-yellow-600"
-                }`}
+        {appointments.length === 0 ? (
+          <p className="text-gray-400 text-sm text-center py-6">
+            No upcoming appointments.
+          </p>
+        ) : (
+          <div className="space-y-4">
+            {appointments.map((apt) => (
+              <div
+                key={apt._id}
+                className="flex items-center justify-between p-4 bg-gray-50 rounded-lg"
               >
-                {apt.status}
-              </span>
-            </div>
-          ))}
-        </div>
+                <div>
+                  <p className="text-primary font-medium text-sm">
+                    {apt.doctor?.name || "Unknown Doctor"}
+                  </p>
+                  <p className="text-gray-400 text-xs">
+                    {apt.doctor?.department}
+                  </p>
+                </div>
+                <div className="text-center">
+                  <p className="text-primary text-sm font-medium">
+                    {new Date(apt.date).toLocaleDateString()}
+                  </p>
+                  <p className="text-gray-400 text-xs">{apt.time}</p>
+                </div>
+                <span
+                  className={`text-xs font-semibold px-3 py-1 rounded-full ${statusStyle[apt.status]}`}
+                >
+                  {apt.status.charAt(0).toUpperCase() + apt.status.slice(1)}
+                </span>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );

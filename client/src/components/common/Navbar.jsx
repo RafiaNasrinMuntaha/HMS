@@ -1,6 +1,13 @@
-import { useState } from "react";
-import { Link, NavLink } from "react-router-dom";
-import { FaSearch, FaBars, FaTimes, FaUserCircle } from "react-icons/fa";
+import { useState, useRef, useEffect } from "react";
+import { Link, NavLink, useNavigate } from "react-router-dom";
+import {
+  FaSearch,
+  FaBars,
+  FaTimes,
+  FaUserCircle,
+  FaChevronDown,
+} from "react-icons/fa";
+import { useAuth } from "../../context/AuthContext";
 
 const navLinks = [
   { label: "Home", to: "/" },
@@ -13,6 +20,31 @@ const navLinks = [
 
 export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const dropdownRef = useRef(null);
+
+  const { user, isLoggedIn, isAdmin, logout } = useAuth();
+  const navigate = useNavigate();
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
+        setDropdownOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  const handleLogout = () => {
+    logout();
+    setDropdownOpen(false);
+    setMenuOpen(false);
+    navigate("/");
+  };
+
+  const dashboardPath = isAdmin ? "/admin/dashboard" : "/patient/dashboard";
 
   return (
     <nav className="bg-primary py-4 px-6 sticky top-0 z-50">
@@ -47,24 +79,77 @@ export default function Navbar() {
             <FaSearch size={18} />
           </button>
 
-          {/* Sign In */}
-          <Link
-            to="/login"
-            className="flex items-center gap-2 text-white text-sm font-medium hover:text-accent transition-colors"
-          >
-            <FaUserCircle size={18} />
-            Sign In
-          </Link>
+          {isLoggedIn ? (
+            // Logged-in: show user dropdown
+            <div className="relative" ref={dropdownRef}>
+              <button
+                onClick={() => setDropdownOpen(!dropdownOpen)}
+                className="flex items-center gap-2 text-white text-sm font-medium hover:text-accent transition-colors"
+              >
+                <FaUserCircle size={20} />
+                <span>{user?.name?.split(" ")[0]}</span>
+                <FaChevronDown
+                  size={12}
+                  className={`transition-transform ${dropdownOpen ? "rotate-180" : ""}`}
+                />
+              </button>
 
-          {/* Sign Up */}
-          <Link
-            to="/register"
-            className="bg-accent text-white text-sm font-semibold px-5 py-2 rounded-full hover:bg-cyan-400 transition-all duration-200"
-          >
-            Sign Up
-          </Link>
+              {dropdownOpen && (
+                <div className="absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-lg border border-gray-100 py-2 z-50">
+                  <div className="px-4 py-2 border-b border-gray-100">
+                    <p className="text-xs text-gray-500">Signed in as</p>
+                    <p className="text-sm font-semibold text-primary truncate">
+                      {user?.email}
+                    </p>
+                    <span className="inline-block mt-1 text-xs bg-accent/10 text-accent px-2 py-0.5 rounded-full capitalize">
+                      {user?.role}
+                    </span>
+                  </div>
+                  <Link
+                    to={dashboardPath}
+                    onClick={() => setDropdownOpen(false)}
+                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-primary transition-colors"
+                  >
+                    Dashboard
+                  </Link>
+                  {!isAdmin && (
+                    <Link
+                      to="/appointment"
+                      onClick={() => setDropdownOpen(false)}
+                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-primary transition-colors"
+                    >
+                      Book Appointment
+                    </Link>
+                  )}
+                  <button
+                    onClick={handleLogout}
+                    className="w-full text-left px-4 py-2 text-sm text-red-500 hover:bg-red-50 transition-colors"
+                  >
+                    Sign Out
+                  </button>
+                </div>
+              )}
+            </div>
+          ) : (
+            // Not logged in: show Sign In + Sign Up
+            <>
+              <Link
+                to="/login"
+                className="flex items-center gap-2 text-white text-sm font-medium hover:text-accent transition-colors"
+              >
+                <FaUserCircle size={18} />
+                Sign In
+              </Link>
+              <Link
+                to="/register"
+                className="bg-accent text-white text-sm font-semibold px-5 py-2 rounded-full hover:bg-cyan-400 transition-all duration-200"
+              >
+                Sign Up
+              </Link>
+            </>
+          )}
 
-          {/* Appointment */}
+          {/* Appointment button — always visible */}
           <Link
             to="/appointment"
             className="bg-white text-primary font-semibold text-sm px-5 py-2 rounded-full hover:bg-accent hover:text-white transition-all duration-200"
@@ -98,20 +183,49 @@ export default function Navbar() {
             </NavLink>
           ))}
           <hr className="border-white/20" />
-          <Link
-            to="/login"
-            onClick={() => setMenuOpen(false)}
-            className="text-white text-sm font-medium"
-          >
-            Sign In
-          </Link>
-          <Link
-            to="/register"
-            onClick={() => setMenuOpen(false)}
-            className="bg-accent text-white text-sm font-semibold px-5 py-2 rounded-full text-center"
-          >
-            Sign Up
-          </Link>
+
+          {isLoggedIn ? (
+            <>
+              <div className="text-white/70 text-xs">
+                Signed in as{" "}
+                <span className="text-white font-semibold">{user?.name}</span>
+                <span className="ml-2 capitalize text-accent">
+                  ({user?.role})
+                </span>
+              </div>
+              <Link
+                to={dashboardPath}
+                onClick={() => setMenuOpen(false)}
+                className="text-white text-sm font-medium"
+              >
+                Dashboard
+              </Link>
+              <button
+                onClick={handleLogout}
+                className="text-left text-red-300 text-sm font-medium"
+              >
+                Sign Out
+              </button>
+            </>
+          ) : (
+            <>
+              <Link
+                to="/login"
+                onClick={() => setMenuOpen(false)}
+                className="text-white text-sm font-medium"
+              >
+                Sign In
+              </Link>
+              <Link
+                to="/register"
+                onClick={() => setMenuOpen(false)}
+                className="bg-accent text-white text-sm font-semibold px-5 py-2 rounded-full text-center"
+              >
+                Sign Up
+              </Link>
+            </>
+          )}
+
           <Link
             to="/appointment"
             onClick={() => setMenuOpen(false)}
