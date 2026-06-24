@@ -42,11 +42,15 @@ export default function ContactPage() {
   const handleChange = (e) =>
     setForm({ ...form, [e.target.name]: e.target.value });
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
   e.preventDefault();
-  const gmailUrl = `https://mail.google.com/mail/?view=cm&to=info@medicore.com.bd&su=${encodeURIComponent(form.subject)}&body=${encodeURIComponent(`Name: ${form.name}\nEmail: ${form.email}\n\n${form.message}`)}`;
-  window.open(gmailUrl, "_blank");
-  setForm({ name: "", email: "", subject: "", message: "" });
+  try {
+    await submitContactApi(form);
+    setSubmitted(true);
+    setForm({ name: "", email: "", subject: "", message: "" });
+  } catch (error) {
+    console.error("Failed to send message:", error);
+  }
 };
 
   return (
