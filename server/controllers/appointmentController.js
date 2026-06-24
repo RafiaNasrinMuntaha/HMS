@@ -9,6 +9,13 @@ import {
 
 export const createAppointment = async (req, res) => {
   try {
+    // 🚫 Block admin from booking appointments
+    if (req.user.role === "admin") {
+      return res.status(403).json({
+        message: "Admin accounts are not allowed to book appointments.",
+      });
+    }
+
     const appointment = await createAppointmentService({
       ...req.body,
       patient: req.user._id,

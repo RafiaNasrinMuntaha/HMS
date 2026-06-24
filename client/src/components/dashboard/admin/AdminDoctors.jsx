@@ -257,7 +257,7 @@ export default function AdminDoctors() {
             updated[idx] = { ...updated[idx], hours: e.target.value };
             setForm({ ...form, schedule: updated });
           }}
-          placeholder='e.g. 09:00 AM - 05:00 PM or "Closed"'
+          placeholder='e.g. 09:00 AM - 08:00 PM or "Closed"'
           className="flex-1 border border-gray-200 rounded-lg px-3 py-2 text-sm outline-none focus:border-accent"
         />
       </div>

@@ -7,7 +7,7 @@ import { createAppointmentApi } from "../../services/appointmentService.js";
 
 const AppointmentPage = () => {
   const navigate = useNavigate();
-  const { token, isLoggedIn } = useAuth();
+  const { token, isLoggedIn, isAdmin } = useAuth();
 
   const [doctors, setDoctors] = useState([]);
   const [loadingDoctors, setLoadingDoctors] = useState(true);
@@ -69,7 +69,11 @@ const AppointmentPage = () => {
     e.preventDefault();
     setErrorMsg("");
     setSuccessMsg("");
-
+    // 🚫 Block admin from booking
+  if (isAdmin) {
+    setErrorMsg("Admin accounts are not allowed to book appointments.");
+    return;
+  }
     if (!formData.doctor) {
       setErrorMsg("Please select a doctor");
       return;
@@ -245,7 +249,6 @@ const AppointmentPage = () => {
                       required
                     >
                       <option value="">Select Time</option>
-                      <option>08:00 AM</option>
                       <option>09:00 AM</option>
                       <option>10:00 AM</option>
                       <option>11:00 AM</option>
@@ -255,6 +258,9 @@ const AppointmentPage = () => {
                       <option>03:00 PM</option>
                       <option>04:00 PM</option>
                       <option>05:00 PM</option>
+                      <option>06:00 PM</option>
+                      <option>07:00 PM</option>
+                      <option>08:00 PM</option>
                     </select>
                   </div>
 
