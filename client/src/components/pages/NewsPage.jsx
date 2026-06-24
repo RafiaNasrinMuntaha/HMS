@@ -127,7 +127,7 @@ const NewsPage = () => {
                       year: "numeric",
                     })}
                   </span>
-                  <span>✍️ By {post.author?.name || "MediCore"}</span>
+                  <span>✍️ By {post.authorName || post.author?.name || "MediCore"}</span>
                   <span className="bg-[#3AABBB] text-white px-3 py-1 rounded-full text-xs">
                     {post.category}
                   </span>

@@ -10,12 +10,20 @@ import {
 
 const empty = {
   name: "",
-  specialty: "",
+  degree: "",
+  role: "",
   department: "",
-  email: "",
-  phone: "",
   bio: "",
   photo: "",
+  schedule: [
+    { day: "Monday", hours: "" },
+    { day: "Tuesday", hours: "" },
+    { day: "Wednesday", hours: "" },
+    { day: "Thursday", hours: "" },
+    { day: "Friday", hours: "" },
+    { day: "Saturday", hours: "" },
+    { day: "Sunday", hours: "" },
+  ],
 };
 
 const departments = [
@@ -45,7 +53,7 @@ export default function AdminDoctors() {
   const fetchDoctors = async () => {
     setLoading(true);
     try {
-      const data = await getDoctorsApi(token);
+      const data = await getDoctorsApi({}, token);
       setDoctors(data);
     } catch (err) {
       console.error("Failed to fetch doctors:", err);
@@ -65,22 +73,26 @@ export default function AdminDoctors() {
   };
 
   const openEdit = (doc) => {
-    setForm({
-      name: doc.name,
-      specialty: doc.specialty,
-      department: doc.department,
-      email: doc.email || "",
-      phone: doc.phone || "",
-      bio: doc.bio || "",
-      photo: doc.photo || "",
-    });
-    setEditId(doc._id);
-    setModal(true);
-  };
+  const defaultDays = ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"];
+  const existingSchedule = defaultDays.map((day) => {
+    const found = doc.schedule?.find((s) => s.day === day);
+    return { day, hours: found?.hours || "" };
+  });
+  setForm({
+    name: doc.name,
+    degree: doc.degree || "",
+    role: doc.role || "",
+    department: doc.department,
+    bio: doc.bio || "",
+    photo: doc.photo || "",
+    schedule: existingSchedule,
+  });
+  setEditId(doc._id);
+  setModal(true);
+};
 
   const handleSave = async () => {
-    if (!form.name || !form.department || !form.specialty) return;
-
+    if (!form.name || !form.department) return;
     setSaving(true);
     try {
       if (editId) {
@@ -126,23 +138,19 @@ export default function AdminDoctors() {
 
       <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
         {loading ? (
-          <div className="text-center py-10 text-gray-400 text-sm">
-            Loading...
-          </div>
+          <div className="text-center py-10 text-gray-400 text-sm">Loading...</div>
         ) : (
           <table className="w-full text-sm">
             <thead className="bg-gray-50 border-b border-gray-100">
               <tr>
-                {["Name", "Specialty", "Department", "Email", "Actions"].map(
-                  (h) => (
-                    <th
-                      key={h}
-                      className="text-left px-5 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wide"
-                    >
-                      {h}
-                    </th>
-                  ),
-                )}
+                {["Name", "Degree", "Role", "Department", "Actions"].map((h) => (
+                  <th
+                    key={h}
+                    className="text-left px-5 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wide"
+                  >
+                    {h}
+                  </th>
+                ))}
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-50">
@@ -154,18 +162,11 @@ export default function AdminDoctors() {
                 </tr>
               ) : (
                 doctors.map((doc) => (
-                  <tr
-                    key={doc._id}
-                    className="hover:bg-gray-50 transition-colors"
-                  >
-                    <td className="px-5 py-4 font-medium text-primary">
-                      {doc.name}
-                    </td>
-                    <td className="px-5 py-4 text-gray-500">{doc.specialty}</td>
-                    <td className="px-5 py-4 text-gray-500">
-                      {doc.department}
-                    </td>
-                    <td className="px-5 py-4 text-gray-500">{doc.email}</td>
+                  <tr key={doc._id} className="hover:bg-gray-50 transition-colors">
+                    <td className="px-5 py-4 font-medium text-primary">{doc.name}</td>
+                    <td className="px-5 py-4 text-gray-500">{doc.degree}</td>
+                    <td className="px-5 py-4 text-gray-500">{doc.role}</td>
+                    <td className="px-5 py-4 text-gray-500">{doc.department}</td>
                     <td className="px-5 py-4">
                       <div className="flex gap-2">
                         <button
@@ -190,7 +191,6 @@ export default function AdminDoctors() {
         )}
       </div>
 
-      {/* Add/Edit Modal */}
       {modal && (
         <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
           <div className="bg-white rounded-xl p-8 max-w-md w-full mx-4 shadow-xl max-h-[90vh] overflow-y-auto">
@@ -198,60 +198,32 @@ export default function AdminDoctors() {
               <h3 className="text-lg font-bold text-primary">
                 {editId ? "Edit Doctor" : "Add New Doctor"}
               </h3>
-              <button
-                onClick={() => setModal(false)}
-                className="text-gray-400 hover:text-primary"
-              >
+              <button onClick={() => setModal(false)} className="text-gray-400 hover:text-primary">
                 <FaTimes />
               </button>
             </div>
             <div className="space-y-4">
               {[
-                {
-                  field: "name",
-                  label: "Full Name",
-                  placeholder: "Dr. John Doe",
-                },
-                {
-                  field: "specialty",
-                  label: "Specialty",
-                  placeholder: "Cardiologist",
-                },
-                {
-                  field: "email",
-                  label: "Email",
-                  placeholder: "doctor@medicore.com",
-                },
-                { field: "phone", label: "Phone", placeholder: "+880 1711..." },
-                {
-                  field: "photo",
-                  label: "Photo URL",
-                  placeholder: "https://images.unsplash.com/...",
-                },
+                { field: "name", label: "Full Name", placeholder: "Dr. John Doe" },
+                { field: "degree", label: "Degree", placeholder: "MBBS, FCPS (Neurology)" },
+                { field: "role", label: "Role", placeholder: "Senior Consultant" },
+                { field: "photo", label: "Photo URL", placeholder: "https://..." },
               ].map(({ field, label, placeholder }) => (
                 <div key={field}>
-                  <label className="text-sm font-medium text-primary block mb-1">
-                    {label}
-                  </label>
+                  <label className="text-sm font-medium text-primary block mb-1">{label}</label>
                   <input
                     value={form[field] || ""}
-                    onChange={(e) =>
-                      setForm({ ...form, [field]: e.target.value })
-                    }
+                    onChange={(e) => setForm({ ...form, [field]: e.target.value })}
                     placeholder={placeholder}
                     className="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm outline-none focus:border-accent transition-colors"
                   />
                 </div>
               ))}
               <div>
-                <label className="text-sm font-medium text-primary block mb-1">
-                  Department
-                </label>
+                <label className="text-sm font-medium text-primary block mb-1">Department</label>
                 <select
                   value={form.department}
-                  onChange={(e) =>
-                    setForm({ ...form, department: e.target.value })
-                  }
+                  onChange={(e) => setForm({ ...form, department: e.target.value })}
                   className="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm outline-none focus:border-accent bg-white"
                 >
                   <option value="">Select department</option>
@@ -261,9 +233,7 @@ export default function AdminDoctors() {
                 </select>
               </div>
               <div>
-                <label className="text-sm font-medium text-primary block mb-1">
-                  Bio
-                </label>
+                <label className="text-sm font-medium text-primary block mb-1">Bio</label>
                 <textarea
                   value={form.bio || ""}
                   onChange={(e) => setForm({ ...form, bio: e.target.value })}
@@ -272,6 +242,28 @@ export default function AdminDoctors() {
                   className="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm outline-none focus:border-accent transition-colors"
                 />
               </div>
+              <div>
+  <label className="text-sm font-medium text-primary block mb-2">
+    Schedule Hours
+  </label>
+  <div className="space-y-2">
+    {form.schedule.map((item, idx) => (
+      <div key={item.day} className="flex items-center gap-3">
+        <span className="text-sm text-gray-500 w-24 flex-shrink-0">{item.day}</span>
+        <input
+          value={item.hours}
+          onChange={(e) => {
+            const updated = [...form.schedule];
+            updated[idx] = { ...updated[idx], hours: e.target.value };
+            setForm({ ...form, schedule: updated });
+          }}
+          placeholder='e.g. 09:00 AM - 05:00 PM or "Closed"'
+          className="flex-1 border border-gray-200 rounded-lg px-3 py-2 text-sm outline-none focus:border-accent"
+        />
+      </div>
+    ))}
+  </div>
+</div>
             </div>
             <div className="flex gap-3 mt-6">
               <button
@@ -292,16 +284,11 @@ export default function AdminDoctors() {
         </div>
       )}
 
-      {/* Delete Confirm */}
       {deleteId && (
         <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
           <div className="bg-white rounded-xl p-8 max-w-sm w-full mx-4 shadow-xl">
-            <h3 className="text-lg font-bold text-primary mb-2">
-              Delete Doctor?
-            </h3>
-            <p className="text-gray-500 text-sm mb-6">
-              This action cannot be undone.
-            </p>
+            <h3 className="text-lg font-bold text-primary mb-2">Delete Doctor?</h3>
+            <p className="text-gray-500 text-sm mb-6">This action cannot be undone.</p>
             <div className="flex gap-3">
               <button
                 onClick={handleDelete}

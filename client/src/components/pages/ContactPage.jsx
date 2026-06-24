@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { FaPhone, FaMapMarkerAlt, FaEnvelope, FaClock } from "react-icons/fa";
 import HeroBanner from "../../components/common/HeroBanner";
+import { submitContactApi } from "../../services/contactService.js";
 
 const contactCards = [
   {
@@ -41,22 +42,12 @@ export default function ContactPage() {
   const handleChange = (e) =>
     setForm({ ...form, [e.target.name]: e.target.value });
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    try {
-      const res = await fetch("http://localhost:5000/api/contact", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(form),
-      });
-      if (!res.ok) throw new Error("Failed to send");
-      setSubmitted(true);
-      setTimeout(() => setSubmitted(false), 3000);
-      setForm({ name: "", email: "", subject: "", message: "" });
-    } catch (err) {
-      console.error("Contact form error:", err);
-    }
-  };
+  const handleSubmit = (e) => {
+  e.preventDefault();
+  const gmailUrl = `https://mail.google.com/mail/?view=cm&to=info@medicore.com.bd&su=${encodeURIComponent(form.subject)}&body=${encodeURIComponent(`Name: ${form.name}\nEmail: ${form.email}\n\n${form.message}`)}`;
+  window.open(gmailUrl, "_blank");
+  setForm({ name: "", email: "", subject: "", message: "" });
+};
 
   return (
     <div>

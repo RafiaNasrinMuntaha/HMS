@@ -17,9 +17,15 @@ const importantLinks = [
 export default function Footer() {
   const [email, setEmail] = useState("");
 
+  const handleNewsletter = () => {
+    if (!email) return;
+    const gmailUrl = `https://mail.google.com/mail/?view=cm&to=info@medicore.com.bd&su=${encodeURIComponent("Newsletter Subscription")}&body=${encodeURIComponent(`Please subscribe me to the MediCore newsletter.\n\nEmail: ${email}`)}`;
+    window.open(gmailUrl, "_blank");
+    setEmail("");
+  };
+
   return (
     <footer className="bg-primary text-white">
-      {/* Main Footer */}
       <div className="max-w-7xl mx-auto px-6 py-14 grid grid-cols-1 md:grid-cols-4 gap-10">
         {/* Brand */}
         <div className="md:col-span-1">
@@ -68,7 +74,10 @@ export default function Footer() {
               placeholder="Enter your email address"
               className="flex-1 bg-transparent text-sm text-white placeholder-blue-300 px-4 py-3 outline-none"
             />
-            <button className="bg-accent px-4 py-3 hover:bg-cyan-400 transition-colors">
+            <button
+              onClick={handleNewsletter}
+              className="bg-accent px-4 py-3 hover:bg-cyan-400 transition-colors"
+            >
               <FaEnvelope className="text-white" size={16} />
             </button>
           </div>

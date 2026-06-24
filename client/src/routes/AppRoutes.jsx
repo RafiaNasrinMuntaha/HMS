@@ -18,6 +18,7 @@ import ServicesPage from "../components/pages/ServicesPage";
 import NewsPage from "../components/pages/NewsPage";
 import NewsDetailPage from "../components/pages/NewsDetailPage";
 import ContactPage from "../components/pages/ContactPage";
+import SearchResultsPage from "../components/pages/SearchResultsPage";
 
 import LoginPage from "../components/auth/LoginPage";
 import RegisterPage from "../components/auth/RegisterPage";
@@ -65,6 +66,7 @@ export default function AppRoutes() {
           <Route path="news/:id" element={<NewsDetailPage />} />
           <Route path="contact" element={<ContactPage />} />
           <Route path="appointment" element={<AppointmentPage />} />
+          <Route path="/search" element={<SearchResultsPage />} />
         </Route>
 
         {/* Auth Routes */}

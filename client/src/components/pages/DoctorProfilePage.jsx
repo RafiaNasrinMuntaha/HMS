@@ -22,7 +22,6 @@ const DoctorProfilePage = () => {
         setLoading(false);
       }
     };
-
     fetchDoctor();
   }, [id]);
 
@@ -30,6 +29,10 @@ const DoctorProfilePage = () => {
     return <div className="p-10 text-center text-gray-400">Loading...</div>;
   if (notFound || !doctor)
     return <div className="p-10 text-center">Doctor not found.</div>;
+
+  const bioBullets = doctor.bio
+    ? doctor.bio.split(".").map((s) => s.trim()).filter(Boolean)
+    : [];
 
   return (
     <div className="max-w-4xl mx-auto px-4 sm:px-6 py-10 sm:py-16">
@@ -42,48 +45,43 @@ const DoctorProfilePage = () => {
 
       <div className="flex flex-col sm:flex-row gap-6 sm:gap-10 items-start">
         <img
-          src={
-            doctor.photo || "https://via.placeholder.com/192x224?text=Doctor"
-          }
+          src={doctor.photo || "https://via.placeholder.com/192x224?text=Doctor"}
           alt={doctor.name}
-          className="w-full sm:w-48 h-56 object-cover rounded border-4 border-[#3AABBB]"
+          className="w-full sm:w-48 h-56 object-cover rounded border-4 border-[#3AABBB] flex-shrink-0"
         />
         <div>
           <h1 className="text-2xl sm:text-3xl font-bold text-[#1B3C6B]">
             {doctor.name}
           </h1>
-          <p className="text-[#3AABBB] font-semibold mt-2">
-            {doctor.specialty}
-          </p>
-          <p className="text-[#3AABBB]">Department: {doctor.department}</p>
-          {doctor.email && (
-            <p className="text-gray-500 text-sm mt-1">✉ {doctor.email}</p>
-          )}
-          {doctor.phone && (
-            <p className="text-gray-500 text-sm">📞 {doctor.phone}</p>
+
+          {/* Degree — gray, below name */}
+          {doctor.degree && (
+            <p className="text-gray-500 text-sm mt-1">{doctor.degree}</p>
           )}
 
-          {doctor.bio && (
+          {/* Role — teal bold */}
+          {doctor.role && (
+            <p className="text-[#3AABBB] font-semibold mt-2">{doctor.role}</p>
+          )}
+
+          {/* Department — teal normal */}
+          <p className="text-[#3AABBB]">Department : {doctor.department}</p>
+
+          {/* Bio as bullet points */}
+          {bioBullets.length > 0 && (
             <>
               <h2 className="text-lg font-bold text-[#1B3C6B] mt-6 mb-2">
-                About
+                Areas of Expertise
               </h2>
-              <p className="text-gray-600 text-sm leading-relaxed">
-                {doctor.bio}
-              </p>
+              <ul className="list-disc list-outside ml-4 space-y-1">
+                {bioBullets.map((point, i) => (
+                  <li key={i} className="text-gray-600 text-sm">
+                    {point}.
+                  </li>
+                ))}
+              </ul>
             </>
           )}
-
-          <div className="mt-3">
-            <span
-              className={`inline-block text-xs font-semibold px-3 py-1 rounded-full
-              ${doctor.available ? "bg-green-100 text-green-600" : "bg-red-100 text-red-500"}`}
-            >
-              {doctor.available
-                ? "✅ Accepting appointments"
-                : "❌ Not available"}
-            </span>
-          </div>
 
           <button
             onClick={() => navigate("/appointment")}

@@ -9,7 +9,7 @@ import newsRoutes from "./routes/news.js";
 import serviceRoutes from "./routes/services.js";
 import contactRoutes from "./routes/contact.js";
 
-dotenv.config();
+dotenv.config({ path: ".env" });
 connectDB();
 
 const app = express();
@@ -33,4 +33,14 @@ app.get("/", (req, res) => {
 });
 
 const PORT = process.env.PORT || 5000;
+// 404 handler — catches unknown routes
+app.use((req, res) => {
+  res.status(404).json({ message: "Route not found" });
+});
+
+// Global error handler — catches any unhandled errors
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(500).json({ message: err.message || "Internal server error" });
+});
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));

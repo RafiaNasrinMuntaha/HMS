@@ -13,7 +13,8 @@ import { registerApi } from "../../services/authService.js";
 
 export default function RegisterPage() {
   const [form, setForm] = useState({
-    name: "",
+    firstName: "",
+    lastName: "",
     email: "",
     phone: "",
     dob: "",
@@ -21,6 +22,7 @@ export default function RegisterPage() {
     confirm: "",
   });
   const [showPass, setShowPass] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -45,16 +47,14 @@ export default function RegisterPage() {
 
     setLoading(true);
     try {
-      // Replaced manual fetch block with abstract API service call
       const data = await registerApi({
-        name: form.name,
+        name: `${form.firstName} ${form.lastName}`,
         email: form.email,
         phone: form.phone,
         dateOfBirth: form.dob,
         password: form.password,
       });
 
-      // Auto-login after register using context hook
       login(
         { _id: data._id, name: data.name, email: data.email, role: data.role },
         data.token,
@@ -71,7 +71,6 @@ export default function RegisterPage() {
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4 py-16">
       <div className="w-full max-w-lg">
-        {/* Logo */}
         <div className="text-center mb-8">
           <Link to="/" className="text-3xl font-bold font-heading">
             <span className="text-primary">MEDI</span>
@@ -90,23 +89,43 @@ export default function RegisterPage() {
           )}
 
           <form onSubmit={handleSubmit} className="space-y-4">
-            {/* Full Name */}
-            <div>
-              <label className="text-sm font-medium text-primary block mb-1.5">
-                Full Name
-              </label>
-              <div className="flex items-center border border-gray-200 rounded-lg overflow-hidden focus-within:border-accent transition-colors">
-                <span className="px-3 text-gray-400">
-                  <FaUser size={14} />
-                </span>
-                <input
-                  name="name"
-                  value={form.name}
-                  onChange={handleChange}
-                  placeholder="John Doe"
-                  required
-                  className="flex-1 py-3 pr-4 text-sm outline-none text-primary"
-                />
+            {/* First + Last Name */}
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="text-sm font-medium text-primary block mb-1.5">
+                  First Name
+                </label>
+                <div className="flex items-center border border-gray-200 rounded-lg overflow-hidden focus-within:border-accent transition-colors">
+                  <span className="px-3 text-gray-400">
+                    <FaUser size={14} />
+                  </span>
+                  <input
+                    name="firstName"
+                    value={form.firstName}
+                    onChange={handleChange}
+                    placeholder="John"
+                    required
+                    className="flex-1 py-3 pr-4 text-sm outline-none text-primary"
+                  />
+                </div>
+              </div>
+              <div>
+                <label className="text-sm font-medium text-primary block mb-1.5">
+                  Last Name
+                </label>
+                <div className="flex items-center border border-gray-200 rounded-lg overflow-hidden focus-within:border-accent transition-colors">
+                  <span className="px-3 text-gray-400">
+                    <FaUser size={14} />
+                  </span>
+                  <input
+                    name="lastName"
+                    value={form.lastName}
+                    onChange={handleChange}
+                    placeholder="Doe"
+                    required
+                    className="flex-1 py-3 pr-4 text-sm outline-none text-primary"
+                  />
+                </div>
               </div>
             </div>
 
@@ -205,13 +224,20 @@ export default function RegisterPage() {
                 </span>
                 <input
                   name="confirm"
-                  type="password"
+                  type={showConfirm ? "text" : "password"}
                   value={form.confirm}
                   onChange={handleChange}
                   placeholder="Repeat password"
                   required
-                  className="flex-1 py-3 pr-4 text-sm outline-none text-primary"
+                  className="flex-1 py-3 text-sm outline-none text-primary"
                 />
+                <button
+                  type="button"
+                  onClick={() => setShowConfirm(!showConfirm)}
+                  className="px-3 text-gray-400 hover:text-primary"
+                >
+                  {showConfirm ? <FaEyeSlash size={14} /> : <FaEye size={14} />}
+                </button>
               </div>
             </div>
 
@@ -226,10 +252,7 @@ export default function RegisterPage() {
 
           <p className="text-center text-sm text-gray-500 mt-6">
             Already have an account?{" "}
-            <Link
-              to="/login"
-              className="text-accent font-semibold hover:underline"
-            >
+            <Link to="/login" className="text-accent font-semibold hover:underline">
               Sign In
             </Link>
           </p>

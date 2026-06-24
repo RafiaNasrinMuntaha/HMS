@@ -134,7 +134,7 @@ export default function PatientAppointments() {
                     className="hover:bg-gray-50 transition-colors"
                   >
                     <td className="px-5 py-4 font-medium text-primary">
-                      {apt.doctor?.name || apt.patientName || "N/A"}
+                      {apt.doctor?.name || "Unknown Doctor"}
                     </td>
                     <td className="px-5 py-4 text-gray-500">
                       {apt.department || "N/A"}

@@ -336,35 +336,28 @@ const AppointmentPage = () => {
                     : "Schedule Hours"}
                 </h2>
                 {selectedDoctor ? (
-                  <div className="space-y-2 text-sm text-gray-600">
-                    <p>
-                      <span className="font-semibold text-[#1b3a6b]">
-                        Specialty:
-                      </span>{" "}
-                      {selectedDoctor.specialty}
-                    </p>
-                    <p>
-                      <span className="font-semibold text-[#1b3a6b]">
-                        Department:
-                      </span>{" "}
-                      {selectedDoctor.department}
-                    </p>
-                    {selectedDoctor.bio && (
-                      <p className="mt-2 italic text-gray-500">
-                        {selectedDoctor.bio}
-                      </p>
-                    )}
-                    <p className="mt-3 text-[#1b3a6b] font-semibold">
-                      {selectedDoctor.available
-                        ? "✅ Currently accepting appointments"
-                        : "❌ Not available for appointments"}
-                    </p>
-                  </div>
-                ) : (
-                  <div className="text-center py-8 text-gray-400">
-                    Please select a doctor to view details
-                  </div>
-                )}
+  <div className="space-y-2">
+    <p className="text-sm font-semibold text-[#1b3a6b] mb-3">
+      {selectedDoctor.name}'s Schedule
+    </p>
+    {selectedDoctor.schedule?.length > 0 ? (
+      selectedDoctor.schedule.map((item, idx) => (
+        <div key={idx} className="flex justify-between items-center py-1 border-b border-gray-50">
+          <span className="font-semibold text-gray-700 text-sm">{item.day}</span>
+          <span className={`font-medium text-sm ${item.hours === "Closed" || !item.hours ? "text-red-500" : "text-[#1b3a6b]"}`}>
+            {item.hours || "Closed"}
+          </span>
+        </div>
+      ))
+    ) : (
+      <p className="text-gray-400 text-sm">No schedule available.</p>
+    )}
+  </div>
+) : (
+  <div className="text-center py-8 text-gray-400">
+    Please select a doctor to view schedule
+  </div>
+)}
               </div>
 
               <div className="border-t border-gray-200 my-6 relative">

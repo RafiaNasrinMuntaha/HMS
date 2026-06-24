@@ -1,11 +1,86 @@
 import User from "../models/User.js";
 import jwt from "jsonwebtoken";
-import bcrypt from "bcryptjs";
 import Appointment from "../models/Appointment.js";
 import Doctor from "../models/Doctor.js";
 
 const generateToken = (id, role) => {
   return jwt.sign({ id, role }, process.env.JWT_SECRET, { expiresIn: "7d" });
+};
+
+export const registerUserService = async ({
+  name,
+  email,
+  password,
+  phone,
+  dateOfBirth,
+  bloodGroup,
+}) => {
+  const userExists = await User.findOne({ email });
+  if (userExists) throw new Error("Email already registered");
+
+  const user = await User.create({
+    name,
+    email,
+    password,
+    phone,
+    dateOfBirth,
+    bloodGroup,
+  });
+
+  return {
+    _id: user._id,
+    name: user.name,
+    email: user.email,
+    role: user.role,
+    token: generateToken(user._id, user.role),
+  };
+};
+
+export const loginUserService = async ({ email, password }) => {
+  const user = await User.findOne({ email });
+  if (!user || !(await user.matchPassword(password))) {
+    throw new Error("Invalid email or password");
+  }
+
+  return {
+    _id: user._id,
+    name: user.name,
+    email: user.email,
+    role: user.role,
+    token: generateToken(user._id, user.role),
+  };
+};
+
+export const getMeService = async (userId) => {
+  return await User.findById(userId).select("-password");
+};
+
+export const updateProfileService = async (
+  userId,
+  { name, email, phone, dateOfBirth }
+) => {
+  const user = await User.findByIdAndUpdate(
+    userId,
+    { name, email, phone, dateOfBirth },
+    { new: true, runValidators: true }
+  ).select("-password");
+  if (!user) throw new Error("User not found");
+  return user;
+};
+
+export const changePasswordService = async (
+  userId,
+  { currentPassword, newPassword }
+) => {
+  const user = await User.findById(userId);
+  if (!user) throw new Error("User not found");
+
+  const isMatch = await user.matchPassword(currentPassword);
+  if (!isMatch) throw new Error("Current password is incorrect");
+
+  user.password = newPassword;
+  await user.save();
+  return { message: "Password updated successfully" };
 };
 
 export const getPatientsService = async () => {
@@ -57,79 +132,4 @@ export const getPatientStatsService = async (userId) => {
   });
 
   return { upcoming, past, pending };
-};
-
-export const updateProfileService = async (
-  userId,
-  { name, email, phone, dateOfBirth },
-) => {
-  const user = await User.findByIdAndUpdate(
-    userId,
-    { name, email, phone, dateOfBirth },
-    { new: true, runValidators: true },
-  ).select("-password");
-  if (!user) throw new Error("User not found");
-  return user;
-};
-
-export const changePasswordService = async (
-  userId,
-  { currentPassword, newPassword },
-) => {
-  const user = await User.findById(userId);
-  if (!user) throw new Error("User not found");
-
-  const isMatch = await user.matchPassword(currentPassword);
-  if (!isMatch) throw new Error("Current password is incorrect");
-
-  user.password = newPassword;
-  await user.save();
-  return { message: "Password updated successfully" };
-};
-export const registerUserService = async ({
-  name,
-  email,
-  password,
-  phone,
-  dateOfBirth,
-  bloodGroup,
-}) => {
-  const userExists = await User.findOne({ email });
-  if (userExists) throw new Error("Email already registered");
-
-  const user = await User.create({
-    name,
-    email,
-    password,
-    phone,
-    dateOfBirth,
-    bloodGroup,
-  });
-
-  return {
-    _id: user._id,
-    name: user.name,
-    email: user.email,
-    role: user.role,
-    token: generateToken(user._id, user.role),
-  };
-};
-
-export const loginUserService = async ({ email, password }) => {
-  const user = await User.findOne({ email });
-  if (!user || !(await user.matchPassword(password))) {
-    throw new Error("Invalid email or password");
-  }
-
-  return {
-    _id: user._id,
-    name: user.name,
-    email: user.email,
-    role: user.role,
-    token: generateToken(user._id, user.role),
-  };
-};
-
-export const getMeService = async (userId) => {
-  return await User.findById(userId).select("-password");
 };

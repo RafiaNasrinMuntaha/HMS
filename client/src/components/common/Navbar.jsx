@@ -21,16 +21,21 @@ const navLinks = [
 export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
   const dropdownRef = useRef(null);
+  const searchRef = useRef(null);
 
   const { user, isLoggedIn, isAdmin, logout } = useAuth();
   const navigate = useNavigate();
 
-  // Close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (e) => {
       if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
         setDropdownOpen(false);
+      }
+      if (searchRef.current && !searchRef.current.contains(e.target)) {
+        setSearchOpen(false);
       }
     };
     document.addEventListener("mousedown", handleClickOutside);
@@ -43,6 +48,15 @@ export default function Navbar() {
     setMenuOpen(false);
     navigate("/");
   };
+
+  const handleSearch = (e) => {
+  e.preventDefault();
+  if (!searchQuery.trim()) return;
+  navigate(`/search?q=${encodeURIComponent(searchQuery.trim())}`);
+  setSearchQuery("");
+  setSearchOpen(false);
+  setMenuOpen(false);
+};
 
   const dashboardPath = isAdmin ? "/admin/dashboard" : "/patient/dashboard";
 
@@ -75,12 +89,38 @@ export default function Navbar() {
 
         {/* Right Side */}
         <div className="hidden md:flex items-center gap-4">
-          <button className="text-white hover:text-accent transition-colors">
-            <FaSearch size={18} />
-          </button>
+          {/* Search */}
+          <div className="relative" ref={searchRef}>
+            <button
+              onClick={() => setSearchOpen(!searchOpen)}
+              className="text-white hover:text-accent transition-colors"
+            >
+              <FaSearch size={18} />
+            </button>
+            {searchOpen && (
+              <form
+                onSubmit={handleSearch}
+                className="absolute right-0 top-8 bg-white rounded-xl shadow-lg border border-gray-100 flex overflow-hidden w-64 z-50"
+              >
+                <input
+                  autoFocus
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder="Search doctors,services,..."
+                  className="flex-1 px-4 py-2.5 text-sm text-primary outline-none"
+                />
+                <button
+                  type="submit"
+                  className="bg-primary px-3 text-white hover:bg-accent transition-colors"
+                >
+                  <FaSearch size={14} />
+                </button>
+              </form>
+            )}
+          </div>
 
           {isLoggedIn ? (
-            // Logged-in: show user dropdown
             <div className="relative" ref={dropdownRef}>
               <button
                 onClick={() => setDropdownOpen(!dropdownOpen)}
@@ -131,7 +171,6 @@ export default function Navbar() {
               )}
             </div>
           ) : (
-            // Not logged in: show Sign In + Sign Up
             <>
               <Link
                 to="/login"
@@ -149,7 +188,6 @@ export default function Navbar() {
             </>
           )}
 
-          {/* Appointment button — always visible */}
           <Link
             to="/appointment"
             className="bg-white text-primary font-semibold text-sm px-5 py-2 rounded-full hover:bg-accent hover:text-white transition-all duration-200"
@@ -183,6 +221,20 @@ export default function Navbar() {
             </NavLink>
           ))}
           <hr className="border-white/20" />
+
+          {/* Mobile Search */}
+          <form onSubmit={handleSearch} className="flex overflow-hidden rounded-lg border border-white/20">
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Search doctors..."
+              className="flex-1 px-4 py-2 text-sm bg-white/10 text-white placeholder-white/50 outline-none"
+            />
+            <button type="submit" className="px-3 bg-accent text-white">
+              <FaSearch size={14} />
+            </button>
+          </form>
 
           {isLoggedIn ? (
             <>
